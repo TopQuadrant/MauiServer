@@ -1,0 +1,61 @@
+package org.topbraid.mauiserver;
+
+import javax.servlet.ServletContext;
+
+import org.topbraid.mauiserver.framework.Request;
+import org.topbraid.mauiserver.framework.Resource;
+import org.topbraid.mauiserver.framework.Resource.Deletable;
+import org.topbraid.mauiserver.framework.Resource.Gettable;
+import org.topbraid.mauiserver.framework.Resource.Puttable;
+import org.topbraid.mauiserver.framework.Response;
+import org.topbraid.mauiserver.tagger.Tagger;
+
+import com.hp.hpl.jena.rdf.model.Model;
+
+public class VocabularyResource extends Resource
+		implements Gettable, Puttable, Deletable {
+	private Tagger tagger;
+
+	public VocabularyResource(ServletContext context, Tagger tagger) {
+		super(context);
+		this.tagger = tagger;
+	}
+
+	@Override
+	public String getURL() {
+		return getContextPath() + getRelativeVocabularyURL(tagger);
+	}
+	
+	@Override
+	public Response doGet(Request request) {
+		Model vocabulary = tagger.getVocabularyJena();
+		if (vocabulary == null) {
+			return request.noContent();
+		}
+		return request.okTurtle(vocabulary);
+	}
+
+	@Override
+	public Response doPut(Request request) {
+		try {
+			Model rdf = request.getBodyRDF();
+			if (rdf == null) {
+				return request.badRequest("SKOS vocabulary in Turtle or RDF/XML format must be sent in request body");
+			}
+			tagger.setVocabulary(rdf);
+			return request.okTurtle(tagger.getVocabularyJena());
+		} catch (MauiServerException ex) {
+			return request.badRequest(ex.getMessage());
+		}
+	}
+
+	@Override
+	public Response doDelete(Request request) {
+		tagger.setVocabulary(null);
+		return request.noContent();
+	}
+
+	public static String getRelativeVocabularyURL(Tagger tagger) {
+		return TaggerResource.getRelativeTaggerURL(tagger) + "/vocab";
+	}
+}
