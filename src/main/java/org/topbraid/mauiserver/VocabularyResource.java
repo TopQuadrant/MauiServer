@@ -10,6 +10,7 @@ import org.topbraid.mauiserver.framework.Resource.Puttable;
 import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.tagger.Tagger;
 
+import com.entopix.maui.vocab.Vocabulary;
 import com.hp.hpl.jena.rdf.model.Model;
 
 public class VocabularyResource extends Resource
@@ -41,6 +42,10 @@ public class VocabularyResource extends Resource
 			Model rdf = request.getBodyRDF();
 			if (rdf == null) {
 				return request.badRequest("SKOS vocabulary in Turtle or RDF/XML format must be sent in request body");
+			}
+			Vocabulary vocab = tagger.toMauiVocabulary(rdf);
+			if (vocab.getVocabularyStore().getNumTerms() == 0) {
+				return request.badRequest("No resources of type skos:Concept found in input file");
 			}
 			tagger.setVocabulary(rdf);
 			return request.okTurtle(tagger.getVocabularyJena());

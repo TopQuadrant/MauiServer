@@ -11,6 +11,7 @@ import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.tagger.TaggerCollection;
 import org.topbraid.mauiserver.tagger.Tagger;
 
+import com.entopix.maui.vocab.VocabularyStore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaggerResource extends Resource implements Gettable, Deletable {
@@ -37,6 +38,14 @@ public class TaggerResource extends Resource implements Gettable, Deletable {
 		r.getRoot().put("id", tagger.getId());
 		r.getRoot().put("is_trained", tagger.isTrained());
 		r.getRoot().put("has_vocabulary", tagger.hasVocabulary());
+		if (tagger.hasVocabulary()) {
+			VocabularyStore store = tagger.getVocabularyMaui().getVocabularyStore();
+			ObjectNode stats = r.getRoot().objectNode();
+			stats.put("num_concepts", store.getNumTerms());
+			stats.put("num_altlabels", store.getNumNonDescriptors());
+			stats.put("num_concepts_with_relationships", store.getNumRelatedTerms());
+			r.getRoot().set("vocab_stats", stats);
+		}
 		ObjectNode links = r.getRoot().objectNode();
 		links.put("service", getContextPath() + "/");
 		links.put("tagger", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger));

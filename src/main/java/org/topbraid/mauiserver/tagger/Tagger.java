@@ -102,7 +102,7 @@ public class Tagger {
 		}
 	}
 
-	private Vocabulary toMauiVocabulary(Model vocabulary) {
+	public Vocabulary toMauiVocabulary(Model vocabulary) {
 		if (vocabulary == null) return null;
 		MauiModelBuilder modelBuilder = new MauiModelBuilder();
 		Vocabulary result = new Vocabulary();
