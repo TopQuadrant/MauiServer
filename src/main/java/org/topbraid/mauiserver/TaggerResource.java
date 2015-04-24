@@ -47,7 +47,7 @@ public class TaggerResource extends Resource implements Gettable, Deletable {
 			r.getRoot().set("vocab_stats", stats);
 		}
 		ObjectNode links = r.getRoot().objectNode();
-		links.put("service", getContextPath() + "/");
+		links.put("home", getContextPath() + "/");
 		links.put("tagger", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger));
 		links.put("config", getContextPath() + ConfigurationResource.getRelativeConfigurationURL(tagger));
 		links.put("vocab", getContextPath() + VocabularyResource.getRelativeVocabularyURL(tagger));
