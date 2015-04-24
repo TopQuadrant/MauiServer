@@ -61,7 +61,8 @@ public class Tagger {
 		this.jenaVocabulary = model;
 		this.mauiVocabulary = toMauiVocabulary(model);
 		store.writeVocabulary(id, model);
-		updateMauiWrapper();
+		// Model needs to be retrained on new vocabulary, so delete the old model
+		setMauiModel(null);
 	}
 	
 	public TaggerConfiguration getConfiguration() {
