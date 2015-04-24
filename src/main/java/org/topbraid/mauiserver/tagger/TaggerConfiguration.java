@@ -9,11 +9,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class TaggerConfiguration {
 	private String title;
 	private String description = null;
-	private String vocabularyURL = null;
 	
 	private final static String fieldTitle = "title";
 	private final static String fieldDescription = "description";
-	private final static String fieldVocabularyURL = "vocabularyURL";
 	
 	public String getTitle() {
 		return title;
@@ -31,20 +29,10 @@ public class TaggerConfiguration {
 		this.description = description;
 	}
 	
-	public String getVocabularyURL() {
-		return vocabularyURL;
-	}
-	
-	public void setVocabularyURL(String vocabularyURL) {
-		// TODO: What exactly does the vocabularyURL field mean? It currently does nothing. 
-		this.vocabularyURL = vocabularyURL;
-	}
-	
 	public ObjectNode toJSON(JsonNodeCreator factory) {
 		ObjectNode result = factory.objectNode();
 		result.put(fieldTitle, title);
 		result.put(fieldDescription, description);
-		result.put(fieldVocabularyURL, vocabularyURL);
 		return result;
 	}
 
@@ -54,7 +42,6 @@ public class TaggerConfiguration {
 		}
 		if (config.has(fieldTitle)) setTitle(config.get(fieldTitle).textValue());
 		if (config.has(fieldDescription)) setDescription(config.get(fieldDescription).textValue());
-		if (config.has(fieldVocabularyURL)) setVocabularyURL(config.get(fieldVocabularyURL).textValue());
 	}
 	
 	public static TaggerConfiguration fromJSON(JsonNode config) {

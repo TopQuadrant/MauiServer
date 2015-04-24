@@ -14,12 +14,12 @@ import org.topbraid.mauiserver.tagger.Tagger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaggerResource extends Resource implements Gettable, Deletable {
-	private final TaggerCollection service;
+	private final TaggerCollection taggers;
 	private final Tagger tagger;
 
 	public TaggerResource(ServletContext context, TaggerCollection service, Tagger tagger) {
 		super(context);
-		this.service = service;
+		this.taggers = service;
 		this.tagger = tagger;
 	}
 	
@@ -51,7 +51,7 @@ public class TaggerResource extends Resource implements Gettable, Deletable {
 
 	@Override
 	public Response doDelete(Request request) {
-		service.deleteTagger(tagger.getId());
+		taggers.deleteTagger(tagger.getId());
 		return request.noContent();
 	}
 

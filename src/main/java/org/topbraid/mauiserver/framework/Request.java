@@ -259,12 +259,6 @@ public class Request {
 				result.set(key, values);
 			}
 		}
-		try {
-			System.out.println(json.writeValueAsString(result));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return result;
 	}
 }
