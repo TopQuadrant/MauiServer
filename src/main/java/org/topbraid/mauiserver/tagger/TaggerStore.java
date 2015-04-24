@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +89,12 @@ public class TaggerStore {
 	public void deleteTagger(String id) {
 		if (!taggerExists(id)) return;
 		File f = getTaggerDirectory(id);
-		f.delete();
+		try {
+			FileUtils.deleteDirectory(f);
+		} catch (IOException ex) {
+			throw new MauiServerException("Failed to delete tagger directory " + 
+					f + ": " + ex.getMessage(), ex);
+		}
 	}
 
 	private boolean fileExists(String taggerId, String filename) {
