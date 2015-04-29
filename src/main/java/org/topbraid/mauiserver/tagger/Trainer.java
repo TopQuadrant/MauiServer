@@ -131,6 +131,8 @@ public class Trainer {
 //		modelBuilder.minNumOccur = 2;
 
 		// Vocabulary stuff
+		// TODO: Get the actual vocabulary name as it is used in the Vocabulary instance 
+		modelBuilder.setVocabularyName("dummy.ttl");
 		modelBuilder.setVocabulary(vocabulary);
 
 		return modelBuilder;
