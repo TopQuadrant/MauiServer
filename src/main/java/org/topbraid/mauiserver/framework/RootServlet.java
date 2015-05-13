@@ -14,8 +14,6 @@ import org.topbraid.mauiserver.framework.Resource.Gettable;
 import org.topbraid.mauiserver.framework.Resource.Postable;
 import org.topbraid.mauiserver.framework.Resource.Puttable;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @SuppressWarnings("serial")
 public class RootServlet extends HttpServlet {
 
@@ -86,10 +84,9 @@ public class RootServlet extends HttpServlet {
 		}
 		return request.methodNotAllowed(request.getMethod(), resource);
 	}
-	
-	private final static ObjectMapper json = new ObjectMapper();
+
 	private Request createRequest(HttpServletRequest req, HttpServletResponse resp) {
-		return new Request(req, resp, json);
+		return new Request(req, resp);
 	}
 
 	private final static String serverInstanceAttribute = "framework.server-instance";

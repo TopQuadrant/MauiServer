@@ -32,12 +32,14 @@ import com.hp.hpl.jena.shared.JenaException;
 public class Request {
 	private final HttpServletRequest request;
 	private final HttpServletResponse response;
-	private final ObjectMapper json;
-	
-	public Request(HttpServletRequest request, HttpServletResponse response, ObjectMapper json) {
+
+	// We'll pass this ObjectMapper around and use it wherever
+	// JSON needs to be serialized.
+	private final static ObjectMapper json = new ObjectMapper();
+
+	public Request(HttpServletRequest request, HttpServletResponse response) {
 		this.request = request;
 		this.response = response;
-		this.json = json;
 	}
 	
 	public String getMethod() {
