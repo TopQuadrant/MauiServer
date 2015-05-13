@@ -8,6 +8,16 @@ Maui Server provides a topic indexing service. It automatically determines the m
 
 This is pre-release work in progress.
 
+## Configuring the data directory
+
+Maui Server needs a **data directory** on the file system where it keeps its data. This directory is established in the following way:
+
+1. If the Java **system property** `MauiServer.dataDir` is set, use its value. (This can be set on the Java command line via `-DMauiServer.dataDir=...`)
+2. Otherwise, if the OS **environment variable** `MAUI_SERVER_DATA_DIR` is set, use its value. (How to set this depends on the operating system.)
+3. Otherwise, use a subdirectory `data` in the **current directory**, from where Maui Server was started.
+
+The directory must already exist, otherwise initialisation will fail.
+
 ## License
 
 This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/licenses/gpl.html).

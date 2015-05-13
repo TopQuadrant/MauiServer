@@ -15,7 +15,25 @@ import org.topbraid.mauiserver.tagger.Tagger;
 public class MauiServer implements Server {
 	private final static Logger log = LoggerFactory.getLogger(RootServlet.class);
 
-	private final TaggerCollection taggers = new TaggerCollection(System.getProperty("user.dir") + "/data");
+	private final TaggerCollection taggers = new TaggerCollection(getDataDir());
+
+	/**
+	 * Establishes the file system directory where Maui Server keeps its data.
+	 */
+	public static String getDataDir() {
+		// Check the Java system property, which can be set via -D on the Java command line
+		if (System.getProperty(dataDirSystemProperty) != null) {
+			return System.getProperty(dataDirSystemProperty);
+		}
+		// Check the OS environment variable
+		if (System.getenv(dataDirEnvVariable) != null) {
+			return System.getenv(dataDirEnvVariable);
+		}
+		// Default: /data subdirectory of current directory
+		return System.getProperty("user.dir") + "/data";
+	}
+	public static final String dataDirSystemProperty = "MauiServer.dataDir";
+	public static final String dataDirEnvVariable = "MAUI_SERVER_DATA_DIR";
 	
 	public Resource getResource(String requestURI, ServletContext context) {
 		String[] path = requestURI.substring(1).split("/", -1);

@@ -55,12 +55,12 @@ public class RootServlet extends HttpServlet {
 
 	private void doRequest(HttpServletRequest req, HttpServletResponse resp) 
 			throws IOException {
-		String requestURI = (req.getServletPath() == null || "".equals(req.getServletPath()))
-				? "/" : req.getServletPath();
-		Resource resource = getServer(req.getServletContext()).getResource(requestURI, req.getServletContext());
 		Request request = createRequest(req, resp);
 		Response response;
 		try {
+			String requestURI = (req.getServletPath() == null || "".equals(req.getServletPath()))
+					? "/" : req.getServletPath();
+			Resource resource = getServer(req.getServletContext()).getResource(requestURI, req.getServletContext());
 			response = createResponse(request, resource);
 		} catch (Exception ex) {
 			response = request.serverError(ex);
