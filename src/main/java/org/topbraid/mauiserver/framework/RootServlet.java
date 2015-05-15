@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServer;
 import org.topbraid.mauiserver.framework.Resource.Deletable;
 import org.topbraid.mauiserver.framework.Resource.Gettable;
@@ -16,7 +18,8 @@ import org.topbraid.mauiserver.framework.Resource.Puttable;
 
 @SuppressWarnings("serial")
 public class RootServlet extends HttpServlet {
-
+	Logger log = LoggerFactory.getLogger(RootServlet.class);
+	
 	/**
 	 * Creates the server instance. This instance will be shared between
 	 * servlets through the {@link ServletContext}. If this was a true
@@ -56,16 +59,41 @@ public class RootServlet extends HttpServlet {
 		Request request = createRequest(req, resp);
 		Response response;
 		try {
-			String requestURI = (req.getServletPath() == null || "".equals(req.getServletPath()))
-					? "/" : req.getServletPath();
+			String requestURI = getLocalRequestUriWithoutQuery(req);
+			log.debug(req.getMethod() + " " + requestURI);
 			Resource resource = getServer(req.getServletContext()).getResource(requestURI, req.getServletContext());
 			response = createResponse(request, resource);
 		} catch (Exception ex) {
+			log.error("Uncaught exception in servlet", ex);
 			response = request.serverError(ex);
 		}
 		response.send();
 	}
 
+	/**
+	 * Returns a processed version of the request URI. The scheme, host
+	 * name and port are omitted. The query string, such as 
+	 * <code>?param1=value&param2=value</code>, is omitted. If the webapp
+	 * doesn't run as the servlet container's root application, then the
+	 * path to the application is omitted. The resulting string always
+	 * starts with a '/'. For example, if the webapp is deployed as
+	 * <code>webapp-name</code>, then the URI
+	 * <code>http://myserver:8080/webapp-name/foo/bar?x=123</code> would be
+	 * turned into <code>/foo/bar</code>.
+	 */
+	private String getLocalRequestUriWithoutQuery(HttpServletRequest req) {
+		String result = req.getRequestURI();
+		if (req.getContextPath() != null) {
+			if (req.getRequestURI().startsWith(req.getContextPath())) {
+				return result.substring(req.getContextPath().length());
+			}
+			log.warn("Mismatch between context path '" + 
+					req.getContextPath() + "' and request URI '" + 
+					req.getRequestURI() + "'");
+		}		
+		return result;
+	}
+	
 	private Response createResponse(Request request, Resource resource) {
 		if (resource == null) {
 			return request.notFound();

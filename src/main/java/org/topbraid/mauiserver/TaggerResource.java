@@ -1,5 +1,9 @@
 package org.topbraid.mauiserver;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 import javax.servlet.ServletContext;
 
 import org.topbraid.mauiserver.framework.Request;
@@ -8,8 +12,8 @@ import org.topbraid.mauiserver.framework.Resource.Deletable;
 import org.topbraid.mauiserver.framework.Resource.Gettable;
 import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
-import org.topbraid.mauiserver.tagger.TaggerCollection;
 import org.topbraid.mauiserver.tagger.Tagger;
+import org.topbraid.mauiserver.tagger.TaggerCollection;
 
 import com.entopix.maui.vocab.VocabularyStore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -65,6 +69,22 @@ public class TaggerResource extends Resource implements Gettable, Deletable {
 	}
 
 	public static String getRelativeTaggerURL(Tagger tagger) {
-		return "/" + tagger.getId();
+		return "/" + encodeTaggerIdForURL(tagger.getId());
+	}
+
+	public static String encodeTaggerIdForURL(String id) {
+		try {
+			return URLEncoder.encode(id, "utf-8");
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException("Can't happen", ex);
+		}
+	}
+	
+	public static String decodeTaggerIdFromURL(String id) {
+		try {
+			return URLDecoder.decode(id, "utf-8"); 
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException("Can't happen", ex);
+		}
 	}
 }

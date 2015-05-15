@@ -43,7 +43,7 @@ public class MauiServer implements Server {
 			return new HomeResource(context, taggers);
 		}
 		String taggerId = path[0];
-		Tagger tagger = taggers.getTagger(taggerId);
+		Tagger tagger = taggers.getTagger(TaggerResource.decodeTaggerIdFromURL(taggerId));
 		if (tagger == null) return null;
 		if (path.length == 1) {
 			return new TaggerResource(context, taggers, tagger);

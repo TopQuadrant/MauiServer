@@ -6,6 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +61,12 @@ public class TaggerStore {
 		List<String> results = new ArrayList<String>();
 		for (File f: path.listFiles()) {
 			if (!f.isDirectory()) continue;
-			results.add(f.getName());
+			String taggerId = decodeTaggerIdFromFilename(f.getName());
+			if (encodeTaggerIdAsFilename(taggerId).equals(f.getName())) {
+				results.add(taggerId);
+			} else {
+				log.warn("Skipping malformed tagger directory " + f.getName());
+			}
 		}
 		log.debug("Listed " + results.size() + " taggers: [" + StringUtils.join(results, ", ") + "]");
 		return results;
@@ -221,10 +229,43 @@ public class TaggerStore {
 	}
 	
 	private File getTaggerDirectory(String id) {
-		return new File(path.getAbsolutePath() + "/" + id);
+		return new File(path.getAbsolutePath() + "/" + encodeTaggerIdAsFilename(id));
 	}
 	
 	private File getTaggerFile(String id, String filename) {
-		return new File(path.getAbsolutePath() + "/" + id + "/" + filename);
+		return new File(path.getAbsolutePath() + "/" + encodeTaggerIdAsFilename(id) + "/" + filename);
+	}
+	
+	/**
+	 * Encodes special characters in a string to make it safe for use
+	 * as a filename. This is approximate; it encodes many characters
+	 * that are in fact safe. Characters are %-encoded.
+	 * 
+	 * @param s An arbitrary string
+	 * @return A version of the input that is safe for use as a filename
+	 */
+	private String encodeTaggerIdAsFilename(String s) {
+		try {
+			s = URLEncoder.encode(s, "utf-8");
+			if (s.startsWith(".")) {
+				// Catch cases like "." and ".."
+				s = "%2E" + s.substring(1);
+			}
+			if (s.startsWith("~")) {
+				// Catch cases like "~" and "~root"
+				s = "%7E" + s.substring(1);
+			}
+			return s;
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException("Can't happen", ex);
+		}
+	}
+	
+	private String decodeTaggerIdFromFilename(String s) {
+		try {
+			return URLDecoder.decode(s, "utf-8");
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException("Can't happen", ex);
+		}
 	}
 }
