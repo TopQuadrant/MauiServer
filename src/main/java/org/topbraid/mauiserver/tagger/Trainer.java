@@ -1,6 +1,5 @@
 package org.topbraid.mauiserver.tagger;
 
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,20 +17,28 @@ public class Trainer {
 	private final Tagger tagger;
 	private boolean locked = false;
 	private Thread trainingThread = null;
-	private Date startTime = null;
-	private Date endTime = null;
-	private int documentCount = -1;
-	private int skippedCount = -1;
-	private String errorMessage = null;
+	private TrainerReport report; 
+	private TrainerReport previousReport; 
 	
 	public Trainer(Tagger tagger) {
+		this(tagger, null);
+	}
+
+	public Trainer(Tagger tagger, TrainerReport report) {
 		this.tagger = tagger;
+		this.report = (report == null ? new TrainerReport() : report);
+	}
+	
+	public TrainerReport getReport() {
+		return report;
 	}
 	
 	public synchronized void lock() {
 		if (locked) throw new IllegalStateException();
 		locked = true;
-		startTime = new Date();
+		previousReport = report;
+		report = new TrainerReport();
+		report.logStart();
 	}
 	
 	public boolean isLocked() {
@@ -39,11 +46,7 @@ public class Trainer {
 	}
 	
 	public boolean isFailed() {
-		return errorMessage != null;
-	}
-	
-	public String getErrorMessage() {
-		return errorMessage;
+		return report.getErrorMessage() != null;
 	}
 	
 	/**
@@ -53,9 +56,9 @@ public class Trainer {
 	 * @param vocabulary The vocabulary to use, in Jena Model form
 	 */
 	public void train(final List<MauiDocument> corpus, int skipped, Vocabulary vocabulary) {
+		if (!locked) throw new IllegalStateException("Must lock() before train()");
 		final MauiModelBuilder modelBuilder = createModelBuilder(vocabulary);
-		documentCount = corpus.size();
-		skippedCount = skipped;
+		report.logDocumentCounts(corpus.size(), skipped);
 		trainingThread = new Thread() {
 			@Override
 			public void run() {
@@ -63,12 +66,13 @@ public class Trainer {
 				try {
 					MauiFilter result = modelBuilder.buildModel(corpus);
 					if (!Thread.currentThread().isInterrupted()) {
-						tagger.setMauiModel(result);
+						done();
+						tagger.setMauiModel(result, report);
 					}
 				} catch (MauiFilterException ex) {
-					errorMessage = "Error while training: " + ex.getMessage();
+					String errorMessage = "Error while training: " + ex.getMessage();
+					report.logError(errorMessage);
 					log.error(errorMessage, ex);
-				} finally {
 					done();
 				}
 				log.debug("Training thread stopped");
@@ -78,42 +82,19 @@ public class Trainer {
 	}
 	
 	private synchronized void done() {
-		endTime = new Date();
+		report.logEnd();
 		locked = false;
 		trainingThread = null;
 	}
 	
 	public synchronized void cancel() {
+		if (!locked) return;
 		// TODO: Find a way of actually stopping the MauiModelBuilder
 		if (trainingThread != null) {
 			trainingThread.interrupt();
 		}
-		startTime = null;
-		endTime = null;
-		documentCount = -1;
-		skippedCount = -1;
-		errorMessage = null;
 		done();
-	}
-	
-	public long getRuntime() {
-		Date end = endTime == null ? new Date() : endTime;
-		return end.getTime() - startTime.getTime();
-	}
-	
-	public Date getStartTime() {
-		return startTime;
-	}
-	
-	public Date getEndTime() {
-		return endTime;
-	}
-	
-	public int getTrainingDocumentCount() {
-		return documentCount;
-	}
-	public int getSkippedTrainingDocumentCount() {
-		return skippedCount;
+		report = previousReport;
 	}
 	
 	protected MauiModelBuilder createModelBuilder(Vocabulary vocabulary) {

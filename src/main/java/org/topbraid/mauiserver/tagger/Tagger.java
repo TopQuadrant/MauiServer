@@ -28,7 +28,7 @@ public class Tagger {
 		this.store = store;
 		this.configuration = store.readConfiguration(id);
 		this.jenaVocabulary = store.readVocabulary(id);
-		this.trainer = new Trainer(this);
+		this.trainer = new Trainer(this, store.readTrainerReport(id));
 		this.mauiModel = store.readMauiModel(id);
 		this.mauiVocabulary = toMauiVocabulary(jenaVocabulary);
 		updateMauiWrapper();
@@ -62,7 +62,7 @@ public class Tagger {
 		this.mauiVocabulary = toMauiVocabulary(model);
 		store.writeVocabulary(id, model);
 		// Model needs to be retrained on new vocabulary, so delete the old model
-		setMauiModel(null);
+		setMauiModel(null, null);
 	}
 	
 	public TaggerConfiguration getConfiguration() {
@@ -78,9 +78,10 @@ public class Tagger {
 		return trainer;
 	}
 	
-	public void setMauiModel(MauiFilter mauiModel) {
+	public void setMauiModel(MauiFilter mauiModel, TrainerReport report) {
 		this.mauiModel = mauiModel;
 		store.writeMauiModel(id, mauiModel);
+		store.writeTrainerReport(id, report);
 		updateMauiWrapper();
 	}
 	

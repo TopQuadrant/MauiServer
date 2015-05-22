@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.util.FileManager;
@@ -33,9 +34,10 @@ import com.hp.hpl.jena.util.FileManager;
 public class TaggerStore {
 	private static final Logger log = LoggerFactory.getLogger(TaggerStore.class);
 	
-	private static final String configFileName = "config.js";
+	private static final String configFileName = "config.json";
 	private static final String vocabularyFileName = "vocabulary.ttl";
 	private static final String mauiModelFileName = "model.maui";
+	private static final String trainerReportFileName = "trainer-report.json";
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
 	private final File path;
@@ -225,6 +227,39 @@ public class TaggerStore {
 			modelBuilder.saveModel(mauiModel);
 		} catch (Exception ex) {
 			throw new MauiServerException("Error while saving model after training: " + ex.getMessage(), ex);
+		}
+	}
+	
+	public File getTrainerReportFile(String taggerId) {
+		return getTaggerFile(taggerId, trainerReportFileName);
+	}
+	
+	public TrainerReport readTrainerReport(String taggerId) {
+		try {
+			return TrainerReport.fromJSON(mapper.readTree(openFile(taggerId, trainerReportFileName)));
+		} catch (FileNotFoundException ex) {
+			return new TrainerReport();
+		} catch (JsonProcessingException ex) {
+			throw new MauiServerException(
+					"JSON processing error on " + trainerReportFileName + " for tagger " + taggerId + ": " + ex.getMessage(), ex);
+		} catch (IOException ex) {
+			throw new MauiServerException(
+					"Error reading from " + trainerReportFileName + " for tagger " + taggerId +": " + ex.getMessage(), ex);
+		}
+	}
+
+	public void writeTrainerReport(String taggerId, TrainerReport report) {
+		File f = getTrainerReportFile(taggerId); 
+		if (report == null) {
+			report = new TrainerReport();
+		}
+		ObjectNode root = mapper.createObjectNode();
+		report.toJSON(root);
+		try {
+			mapper.writeValue(f, root);
+		} catch (IOException ex) {
+			throw new MauiServerException(
+					"Error writing to " + trainerReportFileName + " for tagger " + taggerId + ": " + ex.getMessage(), ex);
 		}
 	}
 	

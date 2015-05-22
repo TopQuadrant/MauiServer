@@ -1,10 +1,6 @@
 package org.topbraid.mauiserver;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 
@@ -78,7 +74,7 @@ public class TrainingResource extends Resource implements Gettable, Postable, De
 		if (tagger.getTrainer().isLocked()) {
 			tagger.getTrainer().cancel();
 		}
-		tagger.setMauiModel(null);
+		tagger.setMauiModel(null, null);
 		return createStatusReport(request);
 	}
 
@@ -96,32 +92,13 @@ public class TrainingResource extends Resource implements Gettable, Postable, De
 			status = "no vocabulary";
 		}
 		response.getRoot().put("training_status", status);
-		if (trainer.getStartTime() != null) {
-			response.getRoot().put("start_time", formatDate(trainer.getStartTime()));
-			if (trainer.getEndTime() != null) {
-				response.getRoot().put("end_time", formatDate(trainer.getEndTime()));
-			}
-			response.getRoot().put("runtime_millis", trainer.getRuntime());
+		if (trainer.getReport().getRuntime() >= 0) {
+			response.getRoot().put("runtime_millis", trainer.getReport().getRuntime());
 		}
-		if (trainer.getTrainingDocumentCount() >= 0) {
-			response.getRoot().put("documents", trainer.getTrainingDocumentCount());
-		}
-		if (trainer.getSkippedTrainingDocumentCount() >= 0) {
-			response.getRoot().put("skipped", trainer.getSkippedTrainingDocumentCount());
-		}
-		if (trainer.isFailed()) {
-			response.getRoot().put("error_message", trainer.getErrorMessage());
-		}
+		trainer.getReport().toJSON(response.getRoot());
 		return response;
 	}
 
-	private static String formatDate(Date date) {
-		TimeZone tz = TimeZone.getDefault();
-	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-	    df.setTimeZone(tz);
-	    return df.format(date);
-	}
-	
 	public static String getRelativeTrainingURL(Tagger tagger) {
 		return TaggerResource.getRelativeTaggerURL(tagger) + "/train";
 	}
