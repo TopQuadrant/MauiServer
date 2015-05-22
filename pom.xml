@@ -4,7 +4,7 @@
     <groupId>org.topbraid</groupId>
     <artifactId>mauiserver</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>Maui Server</name>
 
     <properties>

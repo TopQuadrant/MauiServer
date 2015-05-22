@@ -18,6 +18,13 @@ Maui Server needs a **data directory** on the file system where it keeps its dat
 
 The directory must already exist, otherwise initialisation will fail.
 
+## Building and Running
+
+The project uses Maven for building.
+
+- `mvn package` creates a war file in the `/target` directory, for deployment with a servlet container such as Tomcat or Jetty.
+- `mvn jetty:run` runs Maui Server directly, using Jetty. The server will start up at http://localhost:8080/ . This can be convenient for testing.
+
 ## License
 
 This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/licenses/gpl.html).
