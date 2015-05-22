@@ -22,12 +22,14 @@ public class MauiServer implements Server {
 	 */
 	public static String getDataDir() {
 		// Check the Java system property, which can be set via -D on the Java command line
-		if (System.getProperty(dataDirSystemProperty) != null) {
-			return System.getProperty(dataDirSystemProperty);
+		String dir = System.getProperty(dataDirSystemProperty);
+		if (dir != null && !"".equals(dir)) {
+			return dir;
 		}
 		// Check the OS environment variable
-		if (System.getenv(dataDirEnvVariable) != null) {
-			return System.getenv(dataDirEnvVariable);
+		dir = System.getenv(dataDirEnvVariable);
+		if (dir != null && !"".equals(dir)) {
+			return dir;
 		}
 		// Default: /data subdirectory of current directory
 		return System.getProperty("user.dir") + "/data";
