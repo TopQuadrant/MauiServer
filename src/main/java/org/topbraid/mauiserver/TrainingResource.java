@@ -81,6 +81,7 @@ public class TrainingResource extends Resource implements Gettable, Postable, De
 	private JSONResponse createStatusReport(Request request) {
 		Trainer trainer = tagger.getTrainer();
 		JSONResponse response = request.okJSON();
+		response.getRoot().put("is_trained", tagger.isTrained());
 		String status;
 		if (trainer.isLocked()) {
 			status = "running";
