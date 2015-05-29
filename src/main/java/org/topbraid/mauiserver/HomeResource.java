@@ -56,10 +56,8 @@ public class HomeResource extends Resource implements Gettable, Postable {
 					"A tagger with that ID already exists");
 		}
 		try {
-			Tagger newTagger = taggers.createTagger(taggerId);
-			return request.seeOther(
-					getContextPath() + TaggerResource.getRelativeTaggerURL(newTagger), 
-					"New tagger created");
+			taggers.createTagger(taggerId);
+			return doGet(request);
 		} catch (MauiServerException ex) {
 			return request.serverError(ex);
 		}
