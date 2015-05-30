@@ -35,7 +35,7 @@ public class TaggerResource extends Resource implements Gettable, Deletable {
 	@Override
 	public Response doGet(Request request) {
 		JSONResponse r = request.okJSON();
-		r.getRoot().put("title", "Tagger: " + tagger.getConfiguration().getTitle());
+		r.getRoot().put("title", tagger.getConfiguration().getTitle());
 		if (tagger.getConfiguration().getDescription() != null) {
 			r.getRoot().put("description", tagger.getConfiguration().getDescription());
 		}

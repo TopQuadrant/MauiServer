@@ -10,6 +10,7 @@ import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.tagger.TaggerCollection;
 import org.topbraid.mauiserver.tagger.Tagger;
+import org.topbraid.mauiserver.tagger.TaggerConfiguration;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -39,6 +40,10 @@ public class HomeResource extends Resource implements Gettable, Postable {
 			ObjectNode o = root.objectNode();
 			o.put("id", tagger.getId());
 			o.put("href", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger));
+			o.put("title", tagger.getConfiguration().getTitle());
+			if (tagger.getConfiguration().getDescription() != null) {
+				o.put("description", tagger.getConfiguration().getDescription());
+			}
 			array.add(o);
 		}
 		return response;
@@ -56,7 +61,10 @@ public class HomeResource extends Resource implements Gettable, Postable {
 					"A tagger with that ID already exists");
 		}
 		try {
-			taggers.createTagger(taggerId);
+			Tagger tagger = taggers.createTagger(taggerId);
+			TaggerConfiguration config = tagger.getConfiguration();
+			config.updateFromJSON(request.getBodyJSON());
+			tagger.setConfiguration(config);
 			return doGet(request);
 		} catch (MauiServerException ex) {
 			return request.serverError(ex);
