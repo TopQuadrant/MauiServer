@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf8>
+    <title>Auto-Classification Demo</title>
+    <script src="jquery.js"></script>
+    <script src="underscore.js"></script>
+    <script src="app.js"></script>
+    <style>
+body { margin: 1.5em 1.5em 3em; }
+h1, h2 { margin: 0.6em 0 0.3em; }
+td, th { border: 1px solid #ccc; padding: 0.2em 0.4em; }
+table { border-collapse: collapse; }
+th { text-align: left; }
+td.topic_id { font-size: small; color: #aaa; }
+td.probability { text-align: right; }
+    </style>
+  </head>
+  <body>
+    <h1>Auto-Classification Demo</h1>
+    <form>
+      <div>
+        Content:<br />
+        <textarea id=text rows=10 cols=50></textarea>
+      </div>
+      <div>
+        <select disabled id=tagger>
+          <option disabled selected>Retrieving tagger list…</option>
+        </select>
+        <button disabled id=submit>&nbsp;&nbsp;Go!&nbsp;&nbsp;</button>
+      </div>
+    </form>
+    <div id=results>
+      <h2>Results</h2>
+      <div id=topics></div>
+    </div>
+  </body>
+</html>

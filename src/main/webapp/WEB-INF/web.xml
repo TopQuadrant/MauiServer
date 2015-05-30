@@ -5,6 +5,10 @@
         This is a simple web application with a source code organization
         based on the recommendations of the Application Developer's Guide.
     </description>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>RootServlet</servlet-name>
         <servlet-class>org.topbraid.mauiserver.framework.RootServlet</servlet-class>
