@@ -8,10 +8,11 @@ import org.topbraid.mauiserver.framework.Resource.Gettable;
 import org.topbraid.mauiserver.framework.Resource.Postable;
 import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
-import org.topbraid.mauiserver.tagger.TaggerCollection;
 import org.topbraid.mauiserver.tagger.Tagger;
+import org.topbraid.mauiserver.tagger.TaggerCollection;
 import org.topbraid.mauiserver.tagger.TaggerConfiguration;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -63,7 +64,10 @@ public class HomeResource extends Resource implements Gettable, Postable {
 		try {
 			Tagger tagger = taggers.createTagger(taggerId);
 			TaggerConfiguration config = tagger.getConfiguration();
-			config.updateFromJSON(request.getBodyJSON());
+			JsonNode json = request.getBodyJSON();
+			if (json != null) {
+				config.updateFromJSON(json);
+			}
 			tagger.setConfiguration(config);
 			return doGet(request);
 		} catch (MauiServerException ex) {

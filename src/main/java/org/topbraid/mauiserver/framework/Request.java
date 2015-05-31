@@ -56,10 +56,9 @@ public class Request {
 	 */
 	public JsonNode getBodyJSON() throws MauiServerException {
 		try {
-			// TODO Should support application/x-www-form-urlencoded on PUT. Servlets don't do that automatically. Is there some ready-made code for parsing form-encoded bodies?   
+			// TODO Should support application/x-www-form-urlencoded on PUT. Servlets don't do that automatically. Is there some ready-made code for parsing form-encoded bodies?
 			if ("POST".equals(request.getMethod()) && 
-					request.getContentType() != null &&
-					"application/x-www-form-urlencoded".equals(request.getContentType().toLowerCase().trim())) {
+					"application/x-www-form-urlencoded".equals(getContentType())) {
 				return paramsToJSON(request.getParameterMap());
 			}
 			InputStream in = getBodyInputStream();
@@ -92,9 +91,9 @@ public class Request {
 		try {
 			InputStream in = getBodyInputStream();
 			if (in == null) return null;
-			String mediaType = "text/turtle";
-			if (request.getContentType() != null) {
-				mediaType = request.getContentType().toLowerCase().trim();
+			String mediaType = getContentType();
+			if (mediaType == null) {
+				mediaType = "text/turtle";
 			}
 			String lang = isRdfXmlMediaType(mediaType) ? "RDF/XML" : "Turtle";
 			Model result = ModelFactory.createDefaultModel();
@@ -124,6 +123,18 @@ public class Request {
 		}
 		in.reset();
 		return in;
+	}
+	
+	private String getContentType() {
+		if (request.getContentType() == null) {
+			return null;
+		}
+		String s = request.getContentType().trim();
+		// Handle cases like "application/x-www-url-formencoded ; charset = utf-8"
+		if (s.indexOf(';') > -1) {
+			s = s.substring(0, s.indexOf(';')).trim();
+		}
+		return s.toLowerCase();
 	}
 	
 	private boolean isRdfXmlMediaType(String mediaType) {
