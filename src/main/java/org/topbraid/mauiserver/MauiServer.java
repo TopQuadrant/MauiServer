@@ -21,21 +21,23 @@ public class MauiServer implements Server {
 	 * Establishes the file system directory where Maui Server keeps its data.
 	 */
 	public static String getDataDir() {
-		// Check the Java system property, which can be set via -D on the Java command line
-		String dir = System.getProperty(dataDirSystemProperty);
-		if (dir != null && !"".equals(dir)) {
-			return dir;
-		}
-		// Check the OS environment variable
-		dir = System.getenv(dataDirEnvVariable);
-		if (dir != null && !"".equals(dir)) {
-			return dir;
-		}
 		// Default: /data subdirectory of current directory
-		return System.getProperty("user.dir") + "/data";
+		return getGlobalConfigurationOption(
+				"MauiServer.dataDir", 
+				"MAUI_SERVER_DATA_DIR", 
+				System.getProperty("user.dir") + "/data");
 	}
-	public static final String dataDirSystemProperty = "MauiServer.dataDir";
-	public static final String dataDirEnvVariable = "MAUI_SERVER_DATA_DIR";
+
+	/**
+	 * Establishes the default language for stemming and stopword removal.
+	 * Can be overridden on a per-tagger basis.
+	 */
+	public static String getDefaultLanguage() {
+		return getGlobalConfigurationOption(
+				"MauiServer.defaultLang", 
+				"MAUI_SERVER_DEFAULT_LANG", 
+				"en");
+	}
 	
 	public Resource getResource(String requestURI, ServletContext context) {
 		String[] path = requestURI.substring(1).split("/", -1);
@@ -66,5 +68,20 @@ public class MauiServer implements Server {
 			return new LogResource(context, tagger);
 		}
 		return null;
+	}
+
+	private static String getGlobalConfigurationOption(
+			String systemProperty, String envVariable, String defaultValue) {
+		// Check the Java system property, which can be set via -D on the Java command line
+		String value = System.getProperty(systemProperty);
+		if (value != null && !"".equals(value)) {
+			return value;
+		}
+		// Check the OS environment variable
+		value = System.getenv(envVariable);
+		if (value != null && !"".equals(value)) {
+			return value;
+		}
+		return defaultValue;
 	}
 }

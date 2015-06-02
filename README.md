@@ -27,6 +27,10 @@ The project uses Maven for building.
 
 The API root is at `/`. A small demo app is at `/app/` (requires tagger creation and training through the API).
 
+## Configuring the default language
+
+By default, Maui Server assumes that vocabulary and content are in English. The global language can be set using the Java **system property** `MauiServer.defaultLang`, or the OS **environment variable** `MAUI_SERVER_DEFAULT_LANG`. Supported values are `en`, (English), `fr` (French), `es` (Spanish) and `de` (German). The default language can be overridden on a per-tagger basis using the `lang` key in the configuration.
+
 ## License
 
 This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/licenses/gpl.html).

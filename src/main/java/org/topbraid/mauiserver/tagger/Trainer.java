@@ -111,10 +111,18 @@ public class Trainer {
 		// change to 1 for short documents
 //		modelBuilder.minNumOccur = 2;
 
+		// Language selection stuff
+		modelBuilder.stemmer = tagger.getConfiguration().getStemmer();
+		log.info("Using stemmer: " + modelBuilder.stemmer.getClass().getCanonicalName());
+		modelBuilder.stopwords = tagger.getConfiguration().getStopwords();
+		log.info("Using stopwords: " + modelBuilder.stopwords.getClass().getCanonicalName());
+
 		// Vocabulary stuff
 		// TODO: Get the actual vocabulary name as it is used in the Vocabulary instance 
 		modelBuilder.setVocabularyName("dummy.ttl");
 		modelBuilder.setVocabulary(vocabulary);
+		vocabulary.setStemmer(modelBuilder.stemmer);
+		vocabulary.setStopwords(modelBuilder.stopwords);
 
 		return modelBuilder;
 	}
