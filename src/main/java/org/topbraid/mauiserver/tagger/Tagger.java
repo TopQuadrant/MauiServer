@@ -16,7 +16,7 @@ public class Tagger {
 	private final String id;
 	private final TaggerStore store;
 	private TaggerConfiguration configuration;
-	private Model jenaVocabulary;
+	private Model jenaVocabulary = null;		// lazy loading
 	private Vocabulary mauiVocabulary = null;	// lazy loading
 	private Trainer trainer;
 	private MauiFilter mauiModel = null;		// lazy loading
@@ -26,7 +26,6 @@ public class Tagger {
 		this.id = id;
 		this.store = store;
 		this.configuration = store.readConfiguration(id);
-		this.jenaVocabulary = store.readVocabulary(id);
 		this.trainer = new Trainer(this, store.readTrainerReport(id));
 	}
 	
@@ -39,10 +38,13 @@ public class Tagger {
 	}
 	
 	public boolean hasVocabulary() {
-		return jenaVocabulary != null;
+		return store.hasVocabulary(id);
 	}
 	
 	public Model getVocabularyJena() {
+		if (jenaVocabulary == null) {
+			jenaVocabulary = store.readVocabulary(id);
+		}
 		return jenaVocabulary;
 	}
 
