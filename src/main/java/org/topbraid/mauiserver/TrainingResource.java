@@ -60,7 +60,7 @@ public class TrainingResource extends Resource implements Gettable, Postable, De
 			if (corpus.isEmpty()) {
 				throw new MauiServerException("0 out of " + skipped + " documents were usable as training documents; check expected JSON format!");
 			}
-			trainer.train(corpus, skipped, tagger.getVocabularyMaui());
+			trainer.train(corpus, skipped);
 		} catch (MauiServerException ex) {
 			trainer.cancel();
 			return request.badRequest(ex.getMessage());

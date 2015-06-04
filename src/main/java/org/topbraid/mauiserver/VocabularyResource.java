@@ -47,7 +47,7 @@ public class VocabularyResource extends Resource
 			if (vocab.getVocabularyStore().getNumTerms() == 0) {
 				return request.badRequest("No resources of type skos:Concept found in input file");
 			}
-			tagger.setVocabulary(rdf);
+			tagger.setVocabulary(rdf, vocab);
 			return request.okTurtle(tagger.getVocabularyJena());
 		} catch (MauiServerException ex) {
 			return request.badRequest(ex.getMessage());
@@ -56,7 +56,7 @@ public class VocabularyResource extends Resource
 
 	@Override
 	public Response doDelete(Request request) {
-		tagger.setVocabulary(null);
+		tagger.setVocabulary(null, null);
 		return request.noContent();
 	}
 

@@ -53,11 +53,10 @@ public class Trainer {
 	 * Starts a training job that will be executed asynchronously on its own thread.
 	 * @param corpus The document corpus
 	 * @param skipped The number of "bad" input documents excluded from the corpus, for reporting purposes
-	 * @param vocabulary The vocabulary to use, in Jena Model form
 	 */
-	public void train(final List<MauiDocument> corpus, int skipped, Vocabulary vocabulary) {
+	public void train(final List<MauiDocument> corpus, int skipped) {
 		if (!locked) throw new IllegalStateException("Must lock() before train()");
-		final MauiModelBuilder modelBuilder = createModelBuilder(vocabulary);
+		final MauiModelBuilder modelBuilder = createModelBuilder();
 		report.logDocumentCounts(corpus.size(), skipped);
 		trainingThread = new Thread() {
 			@Override
@@ -97,7 +96,7 @@ public class Trainer {
 		report = previousReport;
 	}
 	
-	protected MauiModelBuilder createModelBuilder(Vocabulary vocabulary) {
+	protected MauiModelBuilder createModelBuilder() {
 		MauiModelBuilder modelBuilder = new MauiModelBuilder();
 
 		// Set features
@@ -112,13 +111,16 @@ public class Trainer {
 //		modelBuilder.minNumOccur = 2;
 
 		// Language selection stuff
+		modelBuilder.documentLanguage = tagger.getConfiguration().getEffectiveLang();
+		log.info("Using document language: " + modelBuilder.documentLanguage);
 		modelBuilder.stemmer = tagger.getConfiguration().getStemmer();
 		log.info("Using stemmer: " + modelBuilder.stemmer.getClass().getCanonicalName());
 		modelBuilder.stopwords = tagger.getConfiguration().getStopwords();
 		log.info("Using stopwords: " + modelBuilder.stopwords.getClass().getCanonicalName());
-
+		
 		// Vocabulary stuff
-		// TODO: Get the actual vocabulary name as it is used in the Vocabulary instance 
+		// TODO: Get the actual vocabulary name as it is used in the Vocabulary instance
+		Vocabulary vocabulary = tagger.getVocabularyMaui();
 		modelBuilder.setVocabularyName("dummy.ttl");
 		modelBuilder.setVocabulary(vocabulary);
 		vocabulary.setStemmer(modelBuilder.stemmer);

@@ -148,13 +148,17 @@ public class TaggerStore {
 		}
 	}
 
+	public boolean hasVocabulary(String taggerId) {
+		return fileExists(taggerId, vocabularyFileName);
+	}
+	
 	/**
 	 * Returns the vocabulary for this tagger as a Jena {@link Model}.
 	 * @param taggerId The ID of the tagger 
 	 * @return The vocabulary model, or <code>null</code> if none was uploaded/provided for the tagger
 	 */
 	public Model readVocabulary(String taggerId) {
-		if (!fileExists(taggerId, vocabularyFileName)) return null;
+		if (!hasVocabulary(taggerId)) return null;
 		try {
 			return FileManager.get().loadModel(getVocabularyFileName(taggerId));
 		} catch (JenaException ex) {
