@@ -4,12 +4,18 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.shared.JenaException;
 
-public abstract class Response {	
+public abstract class Response {
+	private final static Logger log = LoggerFactory.getLogger(Response.class);
+
 	protected final HttpServletResponse http;
 	private int status = HttpServletResponse.SC_OK;
 	
@@ -53,7 +59,12 @@ public abstract class Response {
 		public void send() throws IOException {
 			super.send();
 			http.setContentType("application/json");
-			json.writeValue(http.getOutputStream(), root);
+			try {
+				json.writeValue(http.getOutputStream(), root);
+			} catch (IOException ex) {
+				// Probably the client disconnected
+				log.warn("Failed to write response, possibly due to client closing the connection: " + ex.getMessage());
+			}
 		}
 		
 		@Override
@@ -89,7 +100,12 @@ public abstract class Response {
 		public void send() throws IOException {
 			super.send();
 			http.setContentType("text/turtle;charset=utf-8");
-			model.write(http.getOutputStream(), "TURTLE");
+			try {
+				model.write(http.getOutputStream(), "TURTLE");
+			} catch (JenaException ex) {
+				// Probably the client disconnected
+				log.warn("Failed to write response, possibly due to client closing the connection: " + ex.getMessage());
+			}
 		}
 	}
 	
