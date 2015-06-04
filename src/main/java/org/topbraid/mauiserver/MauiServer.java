@@ -64,9 +64,6 @@ public class MauiServer implements Server {
 		if (path.length == 2 && "train".equals(path[1])) {
 			return new TrainingResource(context, tagger);
 		}
-		if (path.length == 2 && "log".equals(path[1])) {
-			return new LogResource(context, tagger);
-		}
 		return null;
 	}
 
