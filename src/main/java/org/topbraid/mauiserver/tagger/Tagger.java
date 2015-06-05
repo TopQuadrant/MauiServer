@@ -139,7 +139,7 @@ public class Tagger {
 		if (mauiWrapper == null) {
 			if (getVocabularyMaui() == null) return null;
 			if (!isTrained()) return null;
-			mauiModel.setVocabulary(getVocabularyMaui());
+			getMauiModel().setVocabulary(getVocabularyMaui());
 			mauiWrapper = new MauiWrapper(getVocabularyMaui(), getMauiModel());
 		}
 		return mauiWrapper;
