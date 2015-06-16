@@ -98,7 +98,8 @@ public class RootServlet extends HttpServlet {
 		if (resource == null) {
 			return request.notFound();
 		}
-		if ("GET".equals(request.getMethod()) && resource instanceof Gettable) {
+		if (("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) 
+				&& resource instanceof Gettable) {
 			return ((Gettable) resource).doGet(request);
 		}
 		if ("PUT".equals(request.getMethod()) && resource instanceof Puttable) {
