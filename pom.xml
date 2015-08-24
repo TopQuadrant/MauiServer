@@ -3,9 +3,28 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.topbraid</groupId>
     <artifactId>mauiserver</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>war</packaging>
     <name>Maui Server</name>
+    <description>An HTTP wrapper around the Maui Topic Indexer</description>
+    <url>https://github.com/TopQuadrant/MauiServer</url>
+    <inceptionYear>2015</inceptionYear>
+    <issueManagement>
+        <url>https://github.com/TopQuadrant/MauiServer/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL)</name>
+            <url>http://www.gnu.org/licenses/gpl.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/TopQuadrant/MauiServer</url>
+        <connection>scm:git:git://github.com/TopQuadrant/MauiServer.git</connection>
+        <developerConnection>scm:git:git@github.com:TopQuadrant/MauiServer.git</developerConnection>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
