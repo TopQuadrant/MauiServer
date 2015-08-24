@@ -8,7 +8,7 @@ Maui Server provides a topic indexing service. It automatically determines the m
 
 Maui Server requires a Java Servlet Container such as Apache Tomcat or Jetty to run.
 
-Maui Server is distributed as a war file. To install and run it, deploy the war file into the servlet container (usually by copying it into the container's `webapps` directory, after renaming the file to something like `mauiserver.war` or `root.war`).
+Maui Server is distributed as a war file. To install and run it, deploy the war file into the servlet container (usually by copying it into the container's `webapps` directory).
 
 Binary releases are available [from GitHub](https://github.com/TopQuadrant/MauiServer/releases). The very latest pre-release version can also be built from the source repository, see below.
 
