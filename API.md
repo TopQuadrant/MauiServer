@@ -32,6 +32,27 @@ Each tagger comes with several associated resources, such as a configuration res
 | **[Tagger suggestions](#resource-tagger-suggestions)** | `/{tagger-id}/suggest` | Service description (JSON) | | Provide recommendations for document (formencoded) | |
 | **[Tagger log](#resource-tagger-log)** (not yet implemented!) | `/{tagger-id}/log` | Show log (Plain text) | | | Clear log |
 
+## Error handling
+For any response with an HTTP status code other than 2XX, a body in JSON format is included, with the following keys:
+
+| Key | Description | Optional? |
+| --- | --- | --- |
+| status | HTTP status code (int) | |
+| status_text | HTTP status text (e.g., "Not Found") | |
+| message | Error message | |
+| field | Request key/field/param causing the error | Y |
+| value | Value of the offending request field | Y |
+| stacktrace | Java stacktrace for 500 errors | Y |
+
+The following status codes indicate exceptional situations:
+
+| Code | Situation |
+| 204 | In response to successful `DELETE` requests |
+| 400 | Bad client request, see `message` key for details |
+| 405 | Method not supported on this resource, see `Allow` HTTP header |
+| 409 | Precondition not met, e.g., trying to train a tagger without vocabulary |
+| 500 | Nonspecific server error, see `stacktrace` key for debugging purposes |
+
 ## Resource: Service
 URL pattern: `/`
 
