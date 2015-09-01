@@ -47,6 +47,7 @@ For any response with an HTTP status code other than 2XX, a body in JSON format 
 The following status codes indicate exceptional situations:
 
 | Code | Situation |
+| --- | --- |
 | 204 | In response to successful `DELETE` requests |
 | 400 | Bad client request, see `message` key for details |
 | 405 | Method not supported on this resource, see `Allow` HTTP header |
