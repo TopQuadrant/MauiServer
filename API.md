@@ -24,12 +24,12 @@ Each tagger comes with several associated resources, such as a configuration res
 
 | Resource | URL pattern | GET | PUT | POST | DELETE |
 | --- | --- | --- | --- | --- | --- |
-| **[Home](#resource-service)** | `/` | List taggers (JSON) | | Create tagger (JSON, formencoded) | |
+| **[Home](#resource-service)** | `/` | List taggers (JSON) | | Create tagger (formencoded) | |
 | **[Tagger](#resource-tagger)** | `/{tagger-id}` | Tagger status (JSON) | | | Delete tagger |
 | **[Tagger configuration](#resource-tagger-configuration)** | `/{tagger-id}/config` | Show config (JSON) | Replace config (JSON) | Update config (JSON, formencoded) | Reset config |
 | **[Tagger vocabulary](#resource-tagger-vocabulary)** | `/{tagger-id}/vocab` | Return vocabulary (SKOS) | Replace vocabulary (SKOS) | | Clear vocabulary |
 | **[Tagger training](#resource-tagger-training)** | `/{tagger-id}/train` | Training status (JSON) | | Send training documents (JSON) | Clear model |
-| **[Tagger suggestions](#resource-tagger-suggestions)** | `/{tagger-id}/suggest` | Service description (JSON) | | Provide recommendations for document (Plain text, JSON) | |
+| **[Tagger suggestions](#resource-tagger-suggestions)** | `/{tagger-id}/suggest` | Service description (JSON) | | Provide recommendations for document (formencoded) | |
 | **[Tagger log](#resource-tagger-log)** (not yet implemented!) | `/{tagger-id}/log` | Show log (Plain text) | | | Clear log |
 
 ## Resource: Service
