@@ -26,6 +26,10 @@ The directory must already exist, otherwise initialisation will fail.
 
 By default, Maui Server assumes that vocabulary and content are in English. The global language can be set using the Java **system property** `MauiServer.defaultLang`, or the OS **environment variable** `MAUI_SERVER_DEFAULT_LANG`. Supported values are `en`, (English), `fr` (French), `es` (Spanish) and `de` (German). The default language can be overridden on a per-tagger basis using the `lang` key in the configuration.
 
+## API documentation
+
+See [API.md](https://github.com/TopQuadrant/MauiServer/blob/master/API.md).
+
 ## Building and Running from Source
 
 The project uses Maven for building.

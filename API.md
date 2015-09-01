@@ -24,13 +24,13 @@ Each tagger comes with several associated resources, such as a configuration res
 
 | Resource | URL pattern | GET | PUT | POST | DELETE |
 | --- | --- | --- | --- | --- | --- |
-| **Home** | `/` | List taggers (JSON) | | Create tagger (JSON, formencoded) | |
-| **Tagger** | `/{tagger-id}` | Tagger status (JSON) | | | Delete tagger |
-| **Tagger configuration** | `/{tagger-id}/config` | Show config (JSON) | Replace config (JSON) | Update config (JSON, formencoded) | Reset config |
-| **Tagger vocabulary** | `/{tagger-id}/vocab` | Return vocabulary (SKOS) | Replace vocabulary (SKOS) | | Clear vocabulary |
-| **Tagger training** | `/{tagger-id}/train` | Training status (JSON) | | Send training documents (JSON) | Clear model |
-| **Tagger suggestions** | `/{tagger-id}/suggest` | Service description (JSON) | | Provide recommendations for document (Plain text, JSON) | |
-| **Tagger log** (not yet implemented!) | `/{tagger-id}/log` | Show log (Plain text) | | | Clear log |
+| **[Home](#resource-service)** | `/` | List taggers (JSON) | | Create tagger (JSON, formencoded) | |
+| **[Tagger](#resource-tagger)** | `/{tagger-id}` | Tagger status (JSON) | | | Delete tagger |
+| **[Tagger configuration](#resource-tagger-configuration)** | `/{tagger-id}/config` | Show config (JSON) | Replace config (JSON) | Update config (JSON, formencoded) | Reset config |
+| **[Tagger vocabulary](#resource-tagger-vocabulary)** | `/{tagger-id}/vocab` | Return vocabulary (SKOS) | Replace vocabulary (SKOS) | | Clear vocabulary |
+| **[Tagger training](#resource-tagger-training)** | `/{tagger-id}/train` | Training status (JSON) | | Send training documents (JSON) | Clear model |
+| **[Tagger suggestions](#resource-tagger-suggestions)** | `/{tagger-id}/suggest` | Service description (JSON) | | Provide recommendations for document (Plain text, JSON) | |
+| **[Tagger log](#resource-tagger-log)** (not yet implemented!) | `/{tagger-id}/log` | Show log (Plain text) | | | Clear log |
 
 ## Resource: Service
 URL pattern: `/`
@@ -181,9 +181,8 @@ Returns a JSON document indicating training status: Not trained, Trained, Traini
 ### `POST`: Train tagger with training data
 Enclosed with the POST request there must be a collection of documents to be used as training data. The entire collection must be formatted as a single JSON array, where each element is a JSON object representing one document. The fields of the object will be used or ignored based on the tagger's configuration.
 
-```
-curl --data-binary @training-corpus.jsonl http://localhost:8080/test/train
-```
+#### Example request
+`curl --data-binary @training-corpus.jsonl http://localhost:8080/test/train`
 
 ### `DELETE`: Reset model
 Removes the Maui model for this tagger, freeing up memory. The tagger itself will remain on the server, but must be re-trained before it can be used again for suggestions.
