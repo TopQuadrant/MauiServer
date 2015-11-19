@@ -72,6 +72,14 @@
                         <version>1.7.6</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <loginServices>
+                        <loginService implementation="org.eclipse.jetty.security.HashLoginService">
+                            <name>Maui Server</name>
+                            <config>${project.basedir}/src/etc/realm.properties</config>
+                        </loginService>
+                    </loginServices>
+                </configuration>
             </plugin>
             <!-- Set system property for Log4j config file location so jetty:run finds it -->
             <plugin>

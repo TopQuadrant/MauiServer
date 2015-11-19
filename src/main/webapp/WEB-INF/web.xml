@@ -17,4 +17,23 @@
         <servlet-name>RootServlet</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+    <security-role>
+        <role-name>maui-server</role-name>
+    </security-role>
+<!-- Uncomment this section to require basic auth for role "maui-server" -->
+<!--
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Maui Server</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>maui-server</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <login-config>
+        <realm-name>Maui Server</realm-name>
+        <auth-method>BASIC</auth-method>
+    </login-config>
+-->
 </web-app>     

@@ -26,6 +26,18 @@ The directory must already exist, otherwise initialisation will fail.
 
 By default, Maui Server assumes that vocabulary and content are in English. The global language can be set using the Java **system property** `MauiServer.defaultLang`, or the OS **environment variable** `MAUI_SERVER_DEFAULT_LANG`. Supported values are `en`, (English), `fr` (French), `es` (Spanish) and `de` (German). The default language can be overridden on a per-tagger basis using the `lang` key in the configuration.
 
+## Setting up authentication
+
+A simple recipe for securing Maui Server behind a username/password:
+
+1. Uncomment the `<security-constraint>`/`<login-config>` sections in `web.xml`
+2. Add a user with role `maui-server` to your servlet container configuration; for Tomcat, this could mean adding to `/conf/tomcat-users.xml`:
+
+   ```
+   <role rolename="maui-server"/>
+   <user username="admin" password="password" roles="maui-server"/>
+   ```
+
 ## API documentation
 
 See [API.md](https://github.com/TopQuadrant/MauiServer/blob/master/API.md).
