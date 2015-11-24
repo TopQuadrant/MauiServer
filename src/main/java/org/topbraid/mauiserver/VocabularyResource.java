@@ -41,7 +41,7 @@ public class VocabularyResource extends Resource
 		try {
 			Model rdf = request.getBodyRDF();
 			if (rdf == null) {
-				return request.badRequest("SKOS vocabulary in Turtle or RDF/XML format must be sent in request body");
+				return request.badRequest("Missing or empty request body; expected SKOS vocabulary in Turtle or RDF/XML format");
 			}
 			Vocabulary vocab = tagger.toMauiVocabulary(rdf);
 			if (vocab.getVocabularyStore().getNumTerms() == 0) {
