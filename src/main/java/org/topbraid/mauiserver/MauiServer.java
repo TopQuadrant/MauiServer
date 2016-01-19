@@ -40,7 +40,10 @@ public class MauiServer implements Server {
 	}
 	
 	public Resource getResource(String requestURI, ServletContext context) {
-		String[] path = requestURI.substring(1).split("/", -1);
+		if (requestURI.startsWith("/")) {
+			requestURI = requestURI.substring(1);
+		}
+		String[] path = requestURI.split("/", -1);
 		log.debug("Path: " + Arrays.asList(path));
 
 		if (path.length == 0 || (path.length == 1 && "".equals(path[0]))) {
