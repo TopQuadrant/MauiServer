@@ -58,6 +58,10 @@ public class HomeResource extends Resource implements Gettable, Postable {
 		if (taggerId == null) {
 			return request.badRequest("id", "Missing POST parameter: id");
 		}
+		if (!taggers.isValidTaggerId(taggerId)) {
+			return request.badRequest("id", taggerId, 
+					"Tagger ID must not contain \\ or / characters");
+		}
 		if (taggers.taggerExists(taggerId)) {
 			return request.badRequest("id", taggerId, 
 					"A tagger with that ID already exists");

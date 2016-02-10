@@ -1,5 +1,6 @@
 package org.topbraid.mauiserver.tagger;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,12 @@ public class TaggerCollection {
 	}
 	
 	public Collection<String> getTaggers() {
-		return store.listTaggers();
+		Collection<String> results = new ArrayList<String>();
+		for (String id: store.listTaggers()) {
+			if (!isValidTaggerId(id)) continue;
+			results.add(id);
+		}
+		return results;
 	}
 	
 	public Tagger getTagger(String id) {
@@ -36,10 +42,13 @@ public class TaggerCollection {
 	}
 	
 	public boolean taggerExists(String id) {
-		return store.taggerExists(id);
+		return isValidTaggerId(id) && store.taggerExists(id);
 	}
 	
 	public Tagger createTagger(String id) {
+		if (!isValidTaggerId(id)) {
+			throw new MauiServerException("Malformed tagger id: '" + id + "'");
+		}
 		if (taggerExists(id)) {
 			throw new MauiServerException("Tagger id already in use: '" + id + "'");
 		}
@@ -53,5 +62,16 @@ public class TaggerCollection {
 		}
 		store.deleteTagger(id);
 		cachedTaggers.remove(id);
+	}
+	
+	public boolean isValidTaggerId(String id) {
+		if (id == null) return false;
+		if ("".equals(id)) return false;
+		// Tomcat disallows forward and back slashes
+		// (encoded as %2F and %5C) in the path part of the URL,
+		// so we disallow them
+		if (id.contains("/")) return false;
+		if (id.contains("\\")) return false;
+		return true;
 	}
 }

@@ -81,7 +81,7 @@ Returns a list of the taggers available on the server, in JSON format, as well a
 
 
 ### `POST`: Create new tagger
-Creates a new tagger. The tagger's ID must be enclosed with the POST message as form-encoded key-value pairs. Additional configuration parameters for the tagger may be enclosed as well. See the *Tagger Configuration* resource for documentation on the configuration parameters.
+Creates a new tagger. The tagger's ID must be enclosed with the POST message as form-encoded key-value pairs. Additional configuration parameters for the tagger may be enclosed as well. See the *Tagger Configuration* resource for documentation on the configuration parameters. Any string not containing forward or back slashes is a valid tagger ID.
 
 The response is the same as for `GET`.
 
