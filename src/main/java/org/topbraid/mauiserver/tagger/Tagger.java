@@ -103,9 +103,9 @@ public class Tagger {
 		if (!hasVocabulary() || !isTrained()) return null;
 		try {
 			if (log.isDebugEnabled()) {
-				String shortText = text.substring(0, Math.min(text.length(), 100));
-				if (text.length() > 100) shortText += "…";
-				log.debug("Running recommender: " + shortText);
+				String shortText = text.substring(0, Math.min(text.length(), 50));
+				if (text.length() > 50) shortText += "…";
+				log.debug("Running recommender on " + text.length() + "b: " + shortText);
 			}
 			RecommendationResult result = new RecommendationResult(
 					getMauiWrapper().extractTopicsFromText(text, topicsPerDocument));

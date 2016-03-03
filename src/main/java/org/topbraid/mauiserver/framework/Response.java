@@ -18,6 +18,7 @@ public abstract class Response {
 
 	protected final HttpServletResponse http;
 	private int status = HttpServletResponse.SC_OK;
+	private String locationURL = null;
 	
 	public Response(HttpServletResponse response) {
 		this.http = response;
@@ -27,12 +28,17 @@ public abstract class Response {
 		this.status = status;
 	}
 
+	public String getSummary() {
+		return status + (locationURL == null ? "" : " => " + locationURL);
+	}
+	
 	public void setHeader(String header, String value) {
 		http.setHeader(header, value);
 	}
 	
 	public void setRedirectLocation(String url) {
 		setHeader("Location", url);
+		locationURL = url;
 	}
 	
 	public void send() throws IOException {
@@ -65,6 +71,17 @@ public abstract class Response {
 				// Probably the client disconnected
 				log.warn("Failed to write response, possibly due to client closing the connection: " + ex.getMessage());
 			}
+		}
+		
+		@Override
+		public String getSummary() {
+			String message = null;
+			if (root.get("message") != null && root.get("message").asText() != null) {
+				message = root.get("message").asText();
+			} else if (root.get("title") != null && root.get("title").asText() != null) {
+				message = root.get("title").asText();
+			}
+			return super.getSummary() + ", json" + (message == null ? "": ": \"" + message + "\""); 
 		}
 		
 		@Override
@@ -106,6 +123,11 @@ public abstract class Response {
 				// Probably the client disconnected
 				log.warn("Failed to write response, possibly due to client closing the connection: " + ex.getMessage());
 			}
+		}
+
+		@Override
+		public String getSummary() {
+			return super.getSummary() + ", ttl (" + model.size() + "t)"; 
 		}
 	}
 	

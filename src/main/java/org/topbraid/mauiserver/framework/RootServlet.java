@@ -57,10 +57,10 @@ public class RootServlet extends HttpServlet {
 	private void doRequest(HttpServletRequest req, HttpServletResponse resp) 
 			throws IOException {
 		Request request = createRequest(req, resp);
-		Response response;
+		Response response = null;
+		String requestURI = getLocalRequestUriWithoutQuery(req);
+		log.debug(req.getMethod() + " " + requestURI);
 		try {
-			String requestURI = getLocalRequestUriWithoutQuery(req);
-			log.debug(req.getMethod() + " " + requestURI);
 			Resource resource = getServer(req.getServletContext()).getResource(requestURI, req.getServletContext());
 			response = createResponse(request, resource);
 		} catch (Exception ex) {
@@ -68,6 +68,8 @@ public class RootServlet extends HttpServlet {
 			response = request.serverError(ex);
 		}
 		response.send();
+		log.info(req.getMethod() + " " + requestURI + 
+				(response == null ? "" : " " + response.getSummary()));
 	}
 
 	/**

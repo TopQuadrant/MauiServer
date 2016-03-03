@@ -7,13 +7,12 @@ import javax.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.framework.Resource;
-import org.topbraid.mauiserver.framework.RootServlet;
 import org.topbraid.mauiserver.framework.Server;
-import org.topbraid.mauiserver.tagger.TaggerCollection;
 import org.topbraid.mauiserver.tagger.Tagger;
+import org.topbraid.mauiserver.tagger.TaggerCollection;
 
 public class MauiServer implements Server {
-	private final static Logger log = LoggerFactory.getLogger(RootServlet.class);
+	private final static Logger log = LoggerFactory.getLogger(MauiServer.class);
 
 	private final TaggerCollection taggers = new TaggerCollection(getDataDir());
 

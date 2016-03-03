@@ -5,9 +5,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServerException;
 
 public class TaggerCollection {
+	private final static Logger log = LoggerFactory.getLogger(TaggerCollection.class);
+
 	private final String dataDir;
 	private final TaggerStore store;
 	private final Map<String, Tagger> cachedTaggers = new HashMap<String, Tagger>();
@@ -24,7 +28,10 @@ public class TaggerCollection {
 	public Collection<String> getTaggers() {
 		Collection<String> results = new ArrayList<String>();
 		for (String id: store.listTaggers()) {
-			if (!isValidTaggerId(id)) continue;
+			if (!isValidTaggerId(id)) {
+				log.warn("Skipping invalid tagger ID listed in TaggerStore: " + id);
+				continue;
+			}
 			results.add(id);
 		}
 		return results;

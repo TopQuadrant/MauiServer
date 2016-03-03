@@ -24,6 +24,10 @@ public class RecommendationResult {
 		}
 	}
 	
+	public int size() {
+		return ids.size();
+	}
+	
 	public List<String> getRecommendations() {
 		return ids;
 	}

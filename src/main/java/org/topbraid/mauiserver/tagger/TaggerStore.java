@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServerException;
@@ -70,13 +69,12 @@ public class TaggerStore {
 				log.warn("Skipping malformed tagger directory " + f.getName());
 			}
 		}
-		log.debug("Listed " + results.size() + " taggers: [" + StringUtils.join(results, ", ") + "]");
+		log.debug("Listed " + results.size() + " taggers");
 		return results;
 	}
 	
 	public boolean taggerExists(String id) {
 		File f = getTaggerDirectory(id);
-		log.debug("Checking for tagger " + id + "; directory: " + f);
 		if (!f.exists()) return false;
 		if (!f.isDirectory()) return false;
 		return true;
@@ -116,8 +114,10 @@ public class TaggerStore {
 	}
 	
 	public TaggerConfiguration readConfiguration(String taggerId) {
-		try {
-			return TaggerConfiguration.fromJSON(mapper.readTree(openFile(taggerId, configFileName)));
+		File configFile = getTaggerFile(taggerId, configFileName);
+		log.debug("Reading config for " + taggerId + " from " + configFile);
+		try (InputStream in = new FileInputStream(configFile)) {
+			return TaggerConfiguration.fromJSON(mapper.readTree(in));
 		} catch (FileNotFoundException ex) {
 			log.warn(configFileName + " for tagger " + taggerId + " not found. Using defaults.");
 			TaggerConfiguration result = TaggerConfiguration.createWithDefaults(taggerId);

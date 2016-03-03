@@ -51,6 +51,7 @@ public class SuggestResource extends Resource implements Gettable, Postable {
 		}
 		RecommendationResult recommendation = tagger.recommendTags(text);
 		JSONResponse response = request.okJSON();
+		response.getRoot().put("title", recommendation.size() + " recommendations from " + tagger.getId());
 		recommendation.toJSON(response.getRoot());
 		return response;
 	}
