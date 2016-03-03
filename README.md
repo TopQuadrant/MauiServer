@@ -47,7 +47,7 @@ See [API.md](https://github.com/TopQuadrant/MauiServer/blob/master/API.md).
 The project uses Maven for building.
 
 - `mvn package` creates a war file in the `/target` directory, for deployment with a servlet container such as Tomcat or Jetty.
-- `mvn jetty:run` runs Maui Server directly, using Jetty. The server will start up at http://localhost:8080/ . This can be convenient for testing.
+- `mvn jetty:run` runs Maui Server directly, using Jetty. The server will start up at http://localhost:8080/ . This can be convenient for testing. Add `-Djetty.http.port=6666` to run on a different port.
 
 The API root is at `/`. A small demo app is at `/app/` (requires tagger creation and training through the API).
 
