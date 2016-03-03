@@ -40,7 +40,10 @@ public class TaggerCollection {
 	public Tagger getTagger(String id) {
 		if (taggerExists(id)) {
 			if (!cachedTaggers.containsKey(id)) {
-				cachedTaggers.put(id, new Tagger(id, store));
+				Tagger tagger = Tagger.create(id, store);
+				if (tagger != null) {
+					cachedTaggers.put(id, tagger);
+				}
 			}
 		} else {
 			cachedTaggers.remove(id);

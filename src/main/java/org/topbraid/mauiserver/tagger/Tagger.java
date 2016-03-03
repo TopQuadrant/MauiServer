@@ -13,6 +13,19 @@ public class Tagger {
 	private final static Logger log = LoggerFactory.getLogger(Tagger.class);
 	private final static int topicsPerDocument = 10;
 
+	/**
+	 * Creates a Tagger instance that is connected to a particular
+	 * directory in the tagger store. May be null if something is
+	 * wrong with the store.
+	 */
+	public static Tagger create(String id, TaggerStore store) {
+		TaggerConfiguration config = store.readConfiguration(id);
+		if (config == null) {
+			return null;
+		}
+		return new Tagger(config, store);
+	}
+	
 	private final String id;
 	private final TaggerStore store;
 	private TaggerConfiguration configuration;
@@ -22,11 +35,11 @@ public class Tagger {
 	private MauiFilter mauiModel = null;		// lazy loading
 	private MauiWrapper mauiWrapper = null;		// lazy loading
 	
-	public Tagger(String id, TaggerStore store) {
-		this.id = id;
+	private Tagger(TaggerConfiguration config, TaggerStore store) {
+		this.id = config.getId();
+		this.configuration = config;
 		this.store = store;
-		this.configuration = store.readConfiguration(id);
-		this.trainer = new Trainer(this, store.readTrainerReport(id));
+		this.trainer = new Trainer(this, store.readTrainerReport(this.id));
 	}
 	
 	public String getId() {

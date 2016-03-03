@@ -117,7 +117,13 @@ public class TaggerStore {
 		File configFile = getTaggerFile(taggerId, configFileName);
 		log.debug("Reading config for " + taggerId + " from " + configFile);
 		try (InputStream in = new FileInputStream(configFile)) {
-			return TaggerConfiguration.fromJSON(mapper.readTree(in));
+			TaggerConfiguration result = TaggerConfiguration.fromJSON(mapper.readTree(in), taggerId, false);
+			if (!result.getId().equalsIgnoreCase(taggerId)) {
+				log.warn("Tagger ID \"" + result.getId() + 
+						"\" in configuration does not match directory name \"" + taggerId + "\"; skipping tagger");
+				return null;
+			}
+			return result;
 		} catch (FileNotFoundException ex) {
 			log.warn(configFileName + " for tagger " + taggerId + " not found. Using defaults.");
 			TaggerConfiguration result = TaggerConfiguration.createWithDefaults(taggerId);

@@ -12,7 +12,7 @@ import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TaggerCollection;
 
 public class MauiServer implements Server {
-	private final static Logger log = LoggerFactory.getLogger(MauiServer.class);
+	public final static Logger log = LoggerFactory.getLogger(MauiServer.class);
 
 	private final TaggerCollection taggers = new TaggerCollection(getDataDir());
 

@@ -39,6 +39,7 @@ public class HomeResource extends Resource implements Gettable, Postable {
 		root.set("taggers", array);
 		for (String id: taggers.getTaggers()) {
 			Tagger tagger = taggers.getTagger(id);
+			if (tagger == null) continue;
 			ObjectNode o = root.objectNode();
 			o.put("id", tagger.getId());
 			o.put("href", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger));

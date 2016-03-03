@@ -42,7 +42,7 @@ public class ConfigurationResource extends Resource
 			if (json == null) {
 				return request.badRequest("Configuration in JSON format must be sent in request body");
 			}
-			tagger.setConfiguration(TaggerConfiguration.fromJSON(json));
+			tagger.setConfiguration(TaggerConfiguration.fromJSON(json, tagger.getId(), true));
 			return createConfigResponse(request);
 		} catch (MauiServerException ex) {
 			return request.badRequest(ex.getMessage());

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaggerConfiguration {
+	private final String id;
 	private String title;
 	private String description = null;
 	private String lang = null;
@@ -28,6 +29,7 @@ public class TaggerConfiguration {
 	private String stopwordsClass = null;
 	private final String defaultLang = MauiServer.getDefaultLanguage();
 
+	private final static String fieldId = "id";
 	private final static String fieldTitle = "title";
 	private final static String fieldDescription = "description";
 	private final static String fieldLang = "lang";
@@ -49,6 +51,14 @@ public class TaggerConfiguration {
 		put("de", StopwordsGerman.class);
 		put("es", StopwordsSpanish.class);
 	}};
+	
+	public TaggerConfiguration(String id) {
+		this.id = id;
+	}
+	
+	public String getId() {
+		return id;
+	}
 	
 	public String getTitle() {
 		return title;
@@ -147,6 +157,7 @@ public class TaggerConfiguration {
 	
 	public ObjectNode toJSON(JsonNodeCreator factory) {
 		ObjectNode result = factory.objectNode();
+		result.put(fieldId, id);
 		result.put(fieldTitle, title);
 		result.put(fieldDescription, description);
 		result.put(fieldLang, lang);
@@ -165,9 +176,15 @@ public class TaggerConfiguration {
 		if (config.has(fieldStemmerClass)) setStemmerClass(config.get(fieldStemmerClass).textValue());
 		if (config.has(fieldStopwordsClass)) setStopwordsClass(config.get(fieldStopwordsClass).textValue());
 	}
-	
-	public static TaggerConfiguration fromJSON(JsonNode config) {
-		TaggerConfiguration result = new TaggerConfiguration();
+
+	public static TaggerConfiguration fromJSON(JsonNode config, String defaultId, boolean ignoreIdInConfig) {
+		String id;
+		if (ignoreIdInConfig) {
+			id = defaultId;
+		} else {
+			id = config.has(fieldId) ? config.get(fieldId).textValue() : defaultId;
+		}
+		TaggerConfiguration result = new TaggerConfiguration(id);
 		result.updateFromJSON(config);
 		if (!config.has("title")) {
 			throw new MauiServerException("Configuration JSON must have a value for 'title'");
@@ -176,7 +193,7 @@ public class TaggerConfiguration {
 	}
 	
 	public static TaggerConfiguration createWithDefaults(String taggerId) {
-		TaggerConfiguration result = new TaggerConfiguration();
+		TaggerConfiguration result = new TaggerConfiguration(taggerId);
 		result.setTitle(taggerId);
 		return result;
 	}
