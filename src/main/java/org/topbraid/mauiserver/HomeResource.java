@@ -35,6 +35,7 @@ public class HomeResource extends Resource implements Gettable, Postable {
 		root.put("title", "Maui Server");
 		root.put("data_dir", taggers.getDataDir());
 		root.put("default_lang", MauiServer.getDefaultLanguage());
+		root.put("version", MauiServer.getVersion());
 		ArrayNode array = root.arrayNode();
 		root.set("taggers", array);
 		for (String id: taggers.getTaggers()) {

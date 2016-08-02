@@ -60,6 +60,7 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 ### 1.1.0 (under development)
 - Add cross-validation API to compute precision and recall
 - Make maximum number of recommendations returned per document configurable
+- Add "version" key to / resource
 - Bugfix: Problems with tagger ID capitalization (#1)
 - Make logging more informative and less verbose
 - Require Java 7

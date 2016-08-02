@@ -1,6 +1,8 @@
 package org.topbraid.mauiserver;
 
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 
@@ -37,7 +39,25 @@ public class MauiServer implements Server {
 				"MAUI_SERVER_DEFAULT_LANG", 
 				"en");
 	}
-	
+
+	/**
+	 * Returns the application version, as defined in pom.xml
+	 */
+	public static String getVersion() {
+		return version;
+	}
+
+	private static String version;
+	static {
+	    Properties p = new Properties();
+	    try (InputStream in = MauiServer.class.getResourceAsStream("/application.properties")) {
+	    	p.load(in);
+	    	version = p.getProperty("application.version", "0.0.0");
+	    } catch (Exception ex) {
+	    	log.error("Failed to load application.properties", ex);
+	    }
+	}
+
 	public Resource getResource(String requestURI, ServletContext context) {
 		if (requestURI.startsWith("/")) {
 			requestURI = requestURI.substring(1);
