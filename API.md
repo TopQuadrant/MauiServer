@@ -201,11 +201,24 @@ Deletes the vocabulary. The response is `204 No Content`.
 ## Resource: Tagger Training
 URL pattern: `/{tagger-id}/train`
 
+Trains the tagger by submitting a collection of already tagged documents as training data. Training runs asynchronously in the background.
+
 ### `GET`: Training status
-Returns a JSON document indicating training status: Not trained, Trained, Training in progress.
+Returns a JSON document indicating training status.
+
+| Key | Format | Description | 
+| --- | --- | --- |
+| service_status | String | `ready`, `running`, `no vocabulary`, `error` |
+| completed | Boolean | `true` if training was successfully completed |
+| documents | Integer | Number of training documents |
+| skipped | Integer | Number of documents skipped due to lack of content or tags |
+| start_time | xs:dateTime | Time when training was started |
+| end_time | xs:dateTime | Time when training was completed |
+| runtime_millis | Integer | Runtime of running or completed training, in ms |
+| error_message | String | Error message `service_status` is `error` |
 
 #### Example request
-`curl http://localhost/demo/train`
+`curl http://localhost:8080/demo/train`
 
 #### Example response
     {
@@ -221,7 +234,13 @@ Returns a JSON document indicating training status: Not trained, Trained, Traini
 The keys `is_trained` and `training_status` are deprecated, use `completed` and `service_status` instead.
 
 ### `POST`: Train tagger with training data
-Enclosed with the POST request there must be a collection of documents to be used as training data. The entire collection must be formatted as a single JSON array, where each element is a JSON object representing one document. The fields of the object will be used or ignored based on the tagger's configuration.
+Enclosed with the POST request there must be a collection of documents to be used as training data, in JSONL format (one JSON object per line). The JSON object on each line should have the following fields:
+
+| Key | Format | Description | 
+| --- | --- | --- |
+| id | String | Optional document ID |
+| content | String | Text content of the document |
+| topics | Array of Strings | Tags of the document; must match vocabulary prefLabels |
 
 #### Example request
 `curl --data-binary @training-corpus.jsonl http://localhost:8080/test/train`
@@ -235,19 +254,59 @@ URL pattern: `/{tagger-id}/suggest`
 ### `GET`: Service description
 A simple JSON document stating whether the service is operational (that is, a SKOS vocabulary is present and the tagger has been trained).
 
-### `POST`: Perform tag recommendation
-This is the key function of the entire server! A document, either plain text or JSON fields, must be enclosed with the request. Returned is a list of recommended concepts from the SKOS vocabulary in JSON. For each concept, the preferred label, URI, and probability is included.
+#### Example request
+`curl http://localhost:8080/demo/suggest`
+
+#### Example response
+    {
+      "title": "Tag Suggestion Service for Tagger: demo",
+      "usage": "GET or POST with parameter 'text' to get tag suggestions",
+      "is_ready": true
+    }
+
+### `GET` or `POST` with `text`: Perform tag recommendation
+This is the key function of the entire server! Text content is submitted as the `text` parameter, either as a `GET` parameter or as a form-encoded `POST` parameter. Returned is a list of recommended concepts from the SKOS vocabulary in JSON. For each concept, the preferred label, URI, and probability is included.
+
+#### Example request
+`curl -d 'text=The liver is susceptible to disease.' http://localhost:8080/demo/suggest`
+
+#### Example response
+    {
+      "title": "3 recommendations from demo",
+      "topics": [
+        {
+          "id": "http://www.nlm.nih.gov/mesh/2006#D004198",
+          "label": "Disease Susceptibility",
+          "probability": 0.5105573342012862
+        },
+        {
+          "id": "http://www.nlm.nih.gov/mesh/2006#D008099",
+          "label": "Liver",
+          "probability": 0.07828825803579727
+        },
+        {
+          "id": "http://www.nlm.nih.gov/mesh/2006#D004194",
+          "label": "Disease",
+          "probability": 0.0044551539164485905
+        }
+      ]
+    }
 
 ## Resource: Tagger Cross-Validation
 URL pattern: `/{tagger-id}/xvalidate`
 
-This works similar to training, but instead of training and storing a Maui model from training data, it will evaluate the training process, computing precision and recall by cross-validation.
+This works similar to training, but instead of training and storing a Maui model from training data, it will evaluate the training process, computing precision and recall by cross-validation. The number of cross-validation passes can be set in the configuration resource.
 
 ### `GET`: Cross-validation status and results
-Returns a JSON document indicating cross-validation status and results: not run, complete, in progress.
+Returns a JSON document indicating cross-validation status and results. The meaning of most fields is identical to the training resource, with these additions:
+
+| Key | Format | Description | 
+| --- | --- | --- |
+| precision | Double | Precision of tag recommendations |
+| recall | Double | Recall of tag recommendations |
 
 #### Example request
-`curl http://localhost:8080/test/xvalidate`
+`curl http://localhost:8080/demo/xvalidate`
 
 #### Example response
 
@@ -267,7 +326,7 @@ Returns a JSON document indicating cross-validation status and results: not run,
 The expected format is the same as for Tagger Training. This overwrites the previous cross-validation result.
 
 #### Example request
-`curl --data-binary @training-corpus.jsonl http://localhost:8080/test/xvalidate`
+`curl --data-binary @training-corpus.jsonl http://localhost:8080/demo/xvalidate`
 
 ### `DELETE`: Reset cross-validation results
 Deletes the previous cross-validation result and resets the cross-validator to its original state. If a cross-validation job is in progress, it will be cancelled.
