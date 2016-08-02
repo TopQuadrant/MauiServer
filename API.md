@@ -70,6 +70,7 @@ Returns a list of the taggers available on the server, in JSON format, as well a
       "title": "Maui Server",
       "data_dir": "/usr/local/MauiServer/data",
       "default_lang": "en",
+      "version": "1.1.0",
       "taggers": [
         {
           "id": "demo",
@@ -202,6 +203,22 @@ URL pattern: `/{tagger-id}/train`
 
 ### `GET`: Training status
 Returns a JSON document indicating training status: Not trained, Trained, Training in progress.
+
+#### Example request
+`curl http://localhost/demo/train`
+
+#### Example response
+    {
+      "service_status": "ready",
+      "completed": true,
+      "documents": 1000,
+      "skipped": 0,
+      "start_time": "2016-08-02T16:57:28.355+01:00",
+      "runtime_millis": 1135,
+      "end_time": "2016-08-02T16:57:29.490+01:00",
+    }
+
+The keys `is_trained` and `training_status` are deprecated, use `completed` and `service_status` instead.
 
 ### `POST`: Train tagger with training data
 Enclosed with the POST request there must be a collection of documents to be used as training data. The entire collection must be formatted as a single JSON array, where each element is a JSON object representing one document. The fields of the object will be used or ignored based on the tagger's configuration.
