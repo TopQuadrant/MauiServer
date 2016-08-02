@@ -2,7 +2,7 @@
 
 This is Maui Server, an HTTP wrapper around the [Maui Topic Indexer](https://github.com/zelandiya/maui).
 
-Maui Server provides a topic indexing service. It automatically determines the main topics of a text, with candidate topics coming from a [SKOS](http://www.w3.org/2004/02/skos/) vocabulary. It requires training data--documents with previously assigned topics--to work. Maui Server is a Java web application and provides RESTful, JSON-based APIs.
+Maui Server provides a topic indexing service. It automatically determines the main topics of a text, with candidate topics coming from a [SKOS](http://www.w3.org/2004/02/skos/) vocabulary. It requires training data—documents with previously assigned topics—to work. Maui Server is a Java web application and provides RESTful, JSON-based APIs (see [API documentation](https://github.com/TopQuadrant/MauiServer/blob/master/API.md)).
 
 ## Download and Installation
 
