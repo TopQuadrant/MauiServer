@@ -57,7 +57,7 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 
 ## Version history
 
-### 1.1.0 (under development)
+### 1.1.0 (2016-08-02)
 - Add cross-validation API to compute precision and recall
 - Make maximum number of recommendations returned per document configurable
 - Add "version" key to / resource
