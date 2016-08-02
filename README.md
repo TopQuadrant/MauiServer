@@ -62,6 +62,7 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 - Make maximum number of recommendations returned per document configurable
 - Add "version" key to / resource
 - Bugfix: Problems with tagger ID capitalization (#1)
+- Empty text to suggest API now responds 400 instead of 200
 - Make logging more informative and less verbose
 - Require Java 7
 

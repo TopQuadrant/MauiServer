@@ -38,10 +38,12 @@ public class SuggestResource extends Resource implements Gettable, Postable {
 	
 	@Override
 	public Response doPost(Request request) {
-		if (request.get("text") != null) {
-			return doSuggest(request, request.get("text"));
+		if (request.get("text") == null)
+			return request.badRequest("text", "Missing field: 'text'");
+		if (request.get("text").trim().isEmpty()) {
+			return request.badRequest("text", "Empty text");
 		}
-		return request.badRequest("text", "Missing field: 'text'");
+		return doSuggest(request, request.get("text"));
 	}
 
 	private Response doSuggest(Request request, String text) {
