@@ -30,7 +30,7 @@ Each tagger comes with several associated resources, such as a configuration res
 | **[Tagger vocabulary](#resource-tagger-vocabulary)** | `/{tagger-id}/vocab` | Return vocabulary (SKOS) | Replace vocabulary (SKOS) | | Clear vocabulary |
 | **[Tagger training](#resource-tagger-training)** | `/{tagger-id}/train` | Training status (JSON) | | Send training documents (JSON) | Clear model |
 | **[Tagger suggestions](#resource-tagger-suggestions)** | `/{tagger-id}/suggest` | Service description (JSON) | | Provide recommendations for document (formencoded) | |
-| **[Tagger log](#resource-tagger-log)** (not yet implemented!) | `/{tagger-id}/log` | Show log (Plain text) | | | Clear log |
+| **[Cross-validation](#resource-tagger-cross-validation)** | `/{tagger-id}/xvalidate` | Get status (JSON) | | Send training documents (JSON) | Clear results |
 
 ## Error handling
 For any response with an HTTP status code other than 2XX, a body in JSON format is included, with the following keys:
@@ -141,6 +141,7 @@ Returns the tagger's configuration in JSON format.
 | lang | One of `en`, `fr`, `de`, `es` | Language for this tagger, or `null` for the server default |
 | stemmer_class | Qualified Java class name | Custom stemmer impementation; overrides `lang` |
 | stopword_class | Qualified Java class name | Custom stopword implementation; overrides `lang` |
+| cross_validation_passes | Integer >= 2 | Number of cross-validation passes for `xvalidate` |
 
 #### Example request
 `curl http://localhost:8080/demo/config`
@@ -151,7 +152,8 @@ Returns the tagger's configuration in JSON format.
       "description": null,
       "lang": "en",
       "stemmer_class": null,
-      "stopwords_class": null
+      "stopwords_class": null,
+      "cross_validation_passes": 10
     }
 
 ### `PUT`: Replace configuration
@@ -164,7 +166,8 @@ Updates all configuration settings based on the enclosed JSON document. See `GET
       "description": null,
       "lang": "en",
       "stemmer_class": null,
-      "stopwords_class": null
+      "stopwords_class": null,
+      "cross_validation_passes": 10
     }
 
 ### `POST`: Update configuration settings
@@ -207,7 +210,7 @@ Enclosed with the POST request there must be a collection of documents to be use
 `curl --data-binary @training-corpus.jsonl http://localhost:8080/test/train`
 
 ### `DELETE`: Reset model
-Removes the Maui model for this tagger, freeing up memory. The tagger itself will remain on the server, but must be re-trained before it can be used again for suggestions.
+Removes the Maui model for this tagger, freeing up memory. If a training job is in progress, it will be cancelled. The tagger itself will remain on the server, but must be re-trained before it can be used again for suggestions.
 
 ## Resource: Tagger Suggestions
 URL pattern: `/{tagger-id}/suggest`
@@ -218,7 +221,36 @@ A simple JSON document stating whether the service is operational (that is, a SK
 ### `POST`: Perform tag recommendation
 This is the key function of the entire server! A document, either plain text or JSON fields, must be enclosed with the request. Returned is a list of recommended concepts from the SKOS vocabulary in JSON. For each concept, the preferred label, URI, and probability is included.
 
-## Resource: Tagger Log
-URL pattern: `/{tagger-id}/log`
+## Resource: Tagger Cross-Validation
+URL pattern: `/{tagger-id}/xvalidate`
 
-*Not implemented yet!*
+This works similar to training, but instead of training and storing a Maui model from training data, it will evaluate the training process, computing precision and recall by cross-validation.
+
+### `GET`: Cross-validation status and results
+Returns a JSON document indicating cross-validation status and results: not run, complete, in progress.
+
+#### Example request
+`curl http://localhost:8080/test/xvalidate`
+
+#### Example response
+
+    {
+      "completed": true,
+      "service_status": "ready",
+      "runtime_millis": 2151,
+      "start_time": "2016-07-31T09:41:41.822+01:00",
+      "end_time": "2016-07-31T09:41:43.973+01:00",
+      "documents": 146,
+      "skipped": 0,
+      "precision": 0.3433
+      "recall": 0.2721
+    }
+
+### `POST`: Run cross-validation with training data
+The expected format is the same as for Tagger Training. This overwrites the previous cross-validation result.
+
+#### Example request
+`curl --data-binary @training-corpus.jsonl http://localhost:8080/test/xvalidate`
+
+### `DELETE`: Reset cross-validation results
+Deletes the previous cross-validation result and resets the cross-validator to its original state. If a cross-validation job is in progress, it will be cancelled.

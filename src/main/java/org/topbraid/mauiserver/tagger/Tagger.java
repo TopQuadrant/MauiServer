@@ -3,6 +3,7 @@ package org.topbraid.mauiserver.tagger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServerException;
+import org.topbraid.mauiserver.persistence.TaggerStore;
 
 import com.entopix.maui.filters.MauiFilter;
 import com.entopix.maui.main.MauiWrapper;
@@ -11,7 +12,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 public class Tagger {
 	private final static Logger log = LoggerFactory.getLogger(Tagger.class);
-	private final static int topicsPerDocument = 10;
 
 	/**
 	 * Creates a Tagger instance that is connected to a particular
@@ -19,9 +19,11 @@ public class Tagger {
 	 * wrong with the store.
 	 */
 	public static Tagger create(String id, TaggerStore store) {
-		TaggerConfiguration config = store.readConfiguration(id);
+		TaggerConfiguration config = store.getConfigurationStore(id).get();
 		if (config == null) {
-			return null;
+			log.warn("Configuration file for tagger " + id + " not found. Using defaults.");
+			config = TaggerConfiguration.createWithDefaults(id);
+			store.getConfigurationStore(id).put(config);
 		}
 		return new Tagger(config, store);
 	}
@@ -31,7 +33,8 @@ public class Tagger {
 	private TaggerConfiguration configuration;
 	private Model jenaVocabulary = null;		// lazy loading
 	private Vocabulary mauiVocabulary = null;	// lazy loading
-	private Trainer trainer;
+	private JobController trainer;
+	private JobController crossValidator;
 	private MauiFilter mauiModel = null;		// lazy loading
 	private MauiWrapper mauiWrapper = null;		// lazy loading
 	
@@ -39,7 +42,8 @@ public class Tagger {
 		this.id = config.getId();
 		this.configuration = config;
 		this.store = store;
-		this.trainer = new Trainer(this, store.readTrainerReport(this.id));
+		this.trainer = new JobController(store.getTrainerReportStore(this.id));
+		this.crossValidator = new JobController(store.getCrossValidatorReportStore(this.id));
 	}
 	
 	public String getId() {
@@ -47,16 +51,16 @@ public class Tagger {
 	}
 
 	public boolean isTrained() {
-		return store.hasMauiModel(id);
+		return store.getMauiModelStore(id).contains();
 	}
 	
 	public boolean hasVocabulary() {
-		return store.hasVocabulary(id);
+		return store.getVocabularyStore(id).contains();
 	}
 	
 	public Model getVocabularyJena() {
 		if (jenaVocabulary == null) {
-			jenaVocabulary = store.readVocabulary(id);
+			jenaVocabulary = store.getVocabularyStore(id).get();
 		}
 		return jenaVocabulary;
 	}
@@ -80,9 +84,10 @@ public class Tagger {
 	public void setVocabulary(Model model, Vocabulary mauiVocabulary) {
 		this.jenaVocabulary = model;
 		this.mauiVocabulary = mauiVocabulary;
-		store.writeVocabulary(id, model);
+		store.getVocabularyStore(id).put(model);
 		// Model needs to be retrained on new vocabulary, so delete the old model
-		setMauiModel(null, null);
+		setMauiModel(null);
+		store.getTrainerReportStore(id).delete();
 	}
 	
 	public TaggerConfiguration getConfiguration() {
@@ -91,27 +96,34 @@ public class Tagger {
 	
 	public void setConfiguration(TaggerConfiguration configuration) {
 		this.configuration = configuration;
-		store.writeConfiguration(id, configuration);
+		store.getConfigurationStore(id).put(configuration);
 	}
 	
-	public Trainer getTrainer() {
+	public JobController getTrainer() {
 		return trainer;
 	}
-	
+
 	private MauiFilter getMauiModel() {
 		if (mauiModel == null) {
-			mauiModel = store.readMauiModel(id);
+			mauiModel = store.getMauiModelStore(id).get();
 		}
 		return mauiModel;
 	}
 	
-	public void setMauiModel(MauiFilter mauiModel, TrainerReport report) {
+	public void setMauiModel(MauiFilter mauiModel) {
 		this.mauiModel = mauiModel;
-		store.writeMauiModel(id, mauiModel);
-		store.writeTrainerReport(id, report);
+		store.getMauiModelStore(id).put(mauiModel);
 		mauiWrapper = null;
 	}
+
+	public void setTrainingReport(JobReport report) {
+		store.getTrainerReportStore(id).put(report);
+	}
 	
+	public JobController getCrossValidator() {
+		return crossValidator;
+	}
+
 	public RecommendationResult recommendTags(String text) {
 		if (!hasVocabulary() || !isTrained()) return null;
 		try {
@@ -121,7 +133,7 @@ public class Tagger {
 				log.debug("Running recommender on " + text.length() + "b: " + shortText);
 			}
 			RecommendationResult result = new RecommendationResult(
-					getMauiWrapper().extractTopicsFromText(text, topicsPerDocument));
+					getMauiWrapper().extractTopicsFromText(text, configuration.getMaxTopicsPerDocument()));
 			if (log.isDebugEnabled()) {
 				log.debug("Recommendation result: " + result);
 			}
@@ -138,7 +150,7 @@ public class Tagger {
 		result.setStemmer(getConfiguration().getStemmer());
 		result.setStopwords(getConfiguration().getStopwords());
 		result.setLanguage(getConfiguration().getEffectiveLang());
-		result.setVocabularyName(store.getVocabularyFileName(id));
+		result.setVocabularyName(store.getVocabularyFile(id).getAbsolutePath());
 		try {
 			result.initializeFromModel(vocabulary);
 		} catch (Exception ex) {
@@ -150,11 +162,15 @@ public class Tagger {
 	
 	private MauiWrapper getMauiWrapper() {
 		if (mauiWrapper == null) {
-			if (getVocabularyMaui() == null) return null;
 			if (!isTrained()) return null;
-			getMauiModel().setVocabulary(getVocabularyMaui());
-			mauiWrapper = new MauiWrapper(getVocabularyMaui(), getMauiModel());
+			mauiWrapper = getMauiWrapper(getMauiModel());
 		}
 		return mauiWrapper;
+	}
+	
+	public MauiWrapper getMauiWrapper(MauiFilter forMauiModel) {
+		if (getVocabularyMaui() == null) return null;
+		forMauiModel.setVocabulary(getVocabularyMaui());
+		return new MauiWrapper(getVocabularyMaui(), forMauiModel);
 	}
 }

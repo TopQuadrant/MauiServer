@@ -28,6 +28,8 @@ public class TaggerConfiguration {
 	private String stemmerClass = null;
 	private String stopwordsClass = null;
 	private final String defaultLang = MauiServer.getDefaultLanguage();
+	private int crossValidationPasses = 10;
+	private int maxTopicsPerDocument = 10;
 
 	private final static String fieldId = "id";
 	private final static String fieldTitle = "title";
@@ -35,6 +37,8 @@ public class TaggerConfiguration {
 	private final static String fieldLang = "lang";
 	private final static String fieldStemmerClass = "stemmer_class";
 	private final static String fieldStopwordsClass = "stopwords_class";
+	private final static String fieldCrossValidationPasses = "cross_validation_passes";
+	private final static String fieldMaxTopicsPerDocument = "max_topics_per_document";
 	
 	@SuppressWarnings("serial")
 	private final static Map<String,Class<? extends Stemmer>> stemmerRegistry = new HashMap<String,Class<? extends Stemmer>>() {{
@@ -155,6 +159,28 @@ public class TaggerConfiguration {
 		return instantiate(getEffectiveStopwordsClass());
 	}
 	
+	public int getCrossValidationPasses() {
+		return crossValidationPasses;
+	}
+	
+	public void setCrossValidationPasses(int number) {
+		if (number <= 1) {
+			throw new IllegalArgumentException(fieldCrossValidationPasses + " must be at least 2");
+		}
+		crossValidationPasses = number;
+	}
+	
+	public int getMaxTopicsPerDocument() {
+		return maxTopicsPerDocument;
+	}
+	
+	public void setMaxTopicsPerDocument(int number) {
+		if (number <= 1) {
+			throw new IllegalArgumentException(fieldMaxTopicsPerDocument + " must be at least 2");
+		}
+		maxTopicsPerDocument = number;
+	}
+	
 	public ObjectNode toJSON(JsonNodeCreator factory) {
 		ObjectNode result = factory.objectNode();
 		result.put(fieldId, id);
@@ -163,6 +189,8 @@ public class TaggerConfiguration {
 		result.put(fieldLang, lang);
 		result.put(fieldStemmerClass, stemmerClass);
 		result.put(fieldStopwordsClass, stopwordsClass);
+		result.put(fieldCrossValidationPasses, crossValidationPasses);
+		result.put(fieldMaxTopicsPerDocument, maxTopicsPerDocument);
 		return result;
 	}
 
@@ -175,6 +203,8 @@ public class TaggerConfiguration {
 		if (config.has(fieldLang)) setLang(config.get(fieldLang).textValue());
 		if (config.has(fieldStemmerClass)) setStemmerClass(config.get(fieldStemmerClass).textValue());
 		if (config.has(fieldStopwordsClass)) setStopwordsClass(config.get(fieldStopwordsClass).textValue());
+		if (config.has(fieldCrossValidationPasses)) setCrossValidationPasses(config.get(fieldCrossValidationPasses).asInt());
+		if (config.has(fieldMaxTopicsPerDocument)) setMaxTopicsPerDocument(config.get(fieldMaxTopicsPerDocument).asInt());
 	}
 
 	public static TaggerConfiguration fromJSON(JsonNode config, String defaultId, boolean ignoreIdInConfig) {

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServerException;
+import org.topbraid.mauiserver.persistence.TaggerStore;
 
 public class TaggerCollection {
 	private final static Logger log = LoggerFactory.getLogger(TaggerCollection.class);

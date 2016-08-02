@@ -57,6 +57,7 @@ public class TaggerResource extends Resource implements Gettable, Deletable {
 		links.put("vocab", getContextPath() + VocabularyResource.getRelativeVocabularyURL(tagger));
 		links.put("train", getContextPath() + TrainingResource.getRelativeTrainingURL(tagger));
 		links.put("suggest", getContextPath() + SuggestResource.getRelativeSuggesterURL(tagger));
+		links.put("xvalidate", getContextPath() + CrossValidationResource.getRelativeCrossValidationURL(tagger));
 		r.getRoot().set("links", links);
 		return r;
 	}

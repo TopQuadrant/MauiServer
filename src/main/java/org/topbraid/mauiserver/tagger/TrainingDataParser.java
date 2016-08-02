@@ -1,14 +1,12 @@
 package org.topbraid.mauiserver.tagger;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.framework.JsonLinesParser;
 
-import com.entopix.maui.util.MauiDocument;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -33,19 +31,19 @@ public class TrainingDataParser {
 		return skippedDocumentCount + in.getSkippedBadLinesCount();
 	}
 	
-	public List<MauiDocument> getCorpus() {
-		List<MauiDocument> results = new ArrayList<MauiDocument>();
+	public List<TrainingDocument> getCorpus() {
+		List<TrainingDocument> results = new ArrayList<TrainingDocument>();
 		while (in.hasNext()) {
 			JsonNode json = in.next();
 			int line = in.getLineNumber();
-			MauiDocument doc = toMauiDocument(json, line);
+			TrainingDocument doc = toTrainingDocument(json, line);
 			if (doc == null) continue;
 			results.add(doc);
 		}
 		return results;
 	}
 	
-	private MauiDocument toMauiDocument(JsonNode json, int line) {
+	private TrainingDocument toTrainingDocument(JsonNode json, int line) {
 		String id = "doc-" + line;
 		if (json.isArray()) {
 			logSkipDocument("doc-" + line, "Not a JSON object");
@@ -78,7 +76,7 @@ public class TrainingDataParser {
 		}
 		int wordCount = textContent.split("\\s+").length;
 		logAddDocument(id, wordCount, topics.size(), skippedTopics);
-		return new MauiDocument(id, id, textContent, toMauiTopicsString(topics));
+		return new TrainingDocument(id, textContent, topics);
 	}
 
 	private void logSkipDocument(String id, String message) {
@@ -87,17 +85,8 @@ public class TrainingDataParser {
 	}
 	
 	private void logAddDocument(String id, int words, int validTopics, int invalidTopics) {
-		log.info("Adding training document " + id + ": " + words + " words, " + 
+		log.debug("Adding training document " + id + ": " + words + " words, " + 
 				validTopics + " topics" + 
 				((invalidTopics > 0) ? ", " + invalidTopics + " non-string topics skipped" : ""));
-	}
-	
-	public static String toMauiTopicsString(Collection<String> topics) {
-		StringBuilder result = new StringBuilder();
-		for (String topic: topics) {
-			result.append(topic);
-			result.append('\n');
-		}
-		return result.toString();
 	}
 }

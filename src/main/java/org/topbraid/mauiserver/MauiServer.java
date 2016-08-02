@@ -66,6 +66,9 @@ public class MauiServer implements Server {
 		if (path.length == 2 && "train".equals(path[1])) {
 			return new TrainingResource(context, tagger);
 		}
+		if (path.length == 2 && "xvalidate".equals(path[1])) {
+			return new CrossValidationResource(context, tagger);
+		}
 		return null;
 	}
 

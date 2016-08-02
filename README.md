@@ -2,7 +2,7 @@
 
 This is Maui Server, an HTTP wrapper around the [Maui Topic Indexer](https://github.com/zelandiya/maui).
 
-Maui Server provides a topic indexing service. It automatically determines the main topics of a text, with candidate topics coming from a [SKOS](http://www.w3.org/2004/02/skos/) vocabulary. It requires training data--documents with previously assigned topics--to work. Maui Server is a Java web application an provides RESTful, JSON-based APIs.
+Maui Server provides a topic indexing service. It automatically determines the main topics of a text, with candidate topics coming from a [SKOS](http://www.w3.org/2004/02/skos/) vocabulary. It requires training data--documents with previously assigned topics--to work. Maui Server is a Java web application and provides RESTful, JSON-based APIs.
 
 ## Download and Installation
 
@@ -10,7 +10,7 @@ Maui Server provides a topic indexing service. It automatically determines the m
 
 **Download:** Maui Server is distributed as a war file (`mauiserver-X.Y.Z.war`). It can be downloaded [here](https://github.com/TopQuadrant/MauiServer/releases). The very latest pre-release version can also be built from the source repository, see below.
 
-**Installation:** To install and run it, deploy the war file into the servlet container (usually by copying it into the container's `webapps` directory).
+**Installation:** To install and run it, deploy the war file into the servlet container (usually by copying it into the container's `webapps` directory, maybe after renaming it).
 
 ## Configuring the data directory
 
@@ -54,3 +54,21 @@ The API root is at `/`. A small demo app is at `/app/` (requires tagger creation
 ## License
 
 This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/licenses/gpl.html).
+
+## Version history
+
+### 1.1.0 (under development)
+- Add cross-validation API to compute precision and recall
+- Make maximum number of recommendations returned per document configurable
+- Bugfix: Problems with tagger ID capitalization (#1)
+- Make logging more informative and less verbose
+- Require Java 7
+
+### 1.0.1 (2016-02-11)
+- Better support for running with Tomcat authentication
+- Improved error messages
+- Bugfix: make root resource work when no trailing slash in URL
+- Disallow \\ and / in tagger ID to avoid a Tomcat issue
+
+### 1.0.0 (2015-08-24)
+Initial release.

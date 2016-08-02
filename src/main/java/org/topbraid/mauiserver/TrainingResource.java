@@ -4,102 +4,48 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.topbraid.mauiserver.framework.JsonLinesParser;
 import org.topbraid.mauiserver.framework.Request;
-import org.topbraid.mauiserver.framework.Resource;
-import org.topbraid.mauiserver.framework.Resource.Deletable;
-import org.topbraid.mauiserver.framework.Resource.Gettable;
-import org.topbraid.mauiserver.framework.Resource.Postable;
 import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
+import org.topbraid.mauiserver.tagger.AsyncJob;
+import org.topbraid.mauiserver.tagger.JobReport;
 import org.topbraid.mauiserver.tagger.Tagger;
-import org.topbraid.mauiserver.tagger.Trainer;
-import org.topbraid.mauiserver.tagger.TrainingDataParser;
+import org.topbraid.mauiserver.tagger.TrainingDocument;
+import org.topbraid.mauiserver.tagger.TrainingJob;
 
-import com.entopix.maui.util.MauiDocument;
-
-public class TrainingResource extends Resource implements Gettable, Postable, Deletable {
+public class TrainingResource extends AbstractTrainingJobResource {
 	private final Tagger tagger;
 	
 	public TrainingResource(ServletContext context, Tagger tagger) {
-		super(context);
+		super(context, tagger, getRelativeTrainingURL(tagger), tagger.getTrainer(), "training");
 		this.tagger = tagger;
 	}
 	
 	@Override
-	public String getURL() {
-		return getContextPath() + getRelativeTrainingURL(tagger);
-	}
-	
-	@Override
-	public Response doGet(Request request) {
-		return createStatusReport(request);
-	}
-	
-	@Override
-	public Response doPost(Request request) {
-		if (!tagger.hasVocabulary()) {
-			return request.conflict("Tagger must have a vocabulary before it can be trained.");
-		}
-		Trainer trainer = tagger.getTrainer();
-		try {
-			trainer.lock();
-		} catch (IllegalStateException ex) {
-			return request.conflict("Training already in progress. You may use HTTP DELETE to cancel.");
-		}
-		JsonLinesParser in = request.getBodyJsonLines(false);
-		if (in == null) {
-			trainer.cancel();
-			return request.badRequest("Training corpus in JSON Lines format must be sent in request body");
-		}
-		int skipped = -1;
-		try {
-			TrainingDataParser parser = new TrainingDataParser(in);
-			List<MauiDocument> corpus = parser.getCorpus();
-			skipped = parser.getSkippedDocumentCount();
-			if (corpus.isEmpty()) {
-				throw new MauiServerException("0 out of " + skipped + " documents were usable as training documents; check expected JSON format!");
-			}
-			trainer.train(corpus, skipped);
-		} catch (MauiServerException ex) {
-			trainer.cancel();
-			return request.badRequest(ex.getMessage());
-		}
-		return createStatusReport(request);
-		// TODO: Should persist the report, and load it on startup, so that we know when last training was done
-	}
-	
-	@Override
 	public Response doDelete(Request request) {
-		if (tagger.getTrainer().isLocked()) {
-			tagger.getTrainer().cancel();
-		}
-		tagger.setMauiModel(null, null);
-		return createStatusReport(request);
+		tagger.setMauiModel(null);
+		return super.doDelete(request);
 	}
 
-	private JSONResponse createStatusReport(Request request) {
-		Trainer trainer = tagger.getTrainer();
-		JSONResponse response = request.okJSON();
+	@Override
+	protected AsyncJob createJob(List<TrainingDocument> corpus, JobReport report) {
+		return new TrainingJob(tagger, corpus);
+	}
+	
+	@Override
+	protected JSONResponse createStatusReport(Request request) {
+		JSONResponse response = super.createStatusReport(request);
+
+		// We trust the model store more than the report;
+		// more importantly, this ensures that completed and is_trained have same value
+		response.getRoot().put("completed", tagger.isTrained());
+		// Deprecated legacy field; now "completed"
 		response.getRoot().put("is_trained", tagger.isTrained());
-		String status;
-		if (trainer.isLocked()) {
-			status = "running";
-		} else if (trainer.isFailed()) {
-			status = "error";
-		} else if (tagger.hasVocabulary()) {
-			status = "ready";
-		} else {
-			status = "no vocabulary";
-		}
-		response.getRoot().put("training_status", status);
-		if (trainer.getReport().getRuntime() >= 0) {
-			response.getRoot().put("runtime_millis", trainer.getReport().getRuntime());
-		}
-		trainer.getReport().toJSON(response.getRoot());
+		// Deprecated legacy field; now "job_status"
+		response.getRoot().put("training_status", response.getRoot().get("service_status").asText());
 		return response;
 	}
-
+	
 	public static String getRelativeTrainingURL(Tagger tagger) {
 		return TaggerResource.getRelativeTaggerURL(tagger) + "/train";
 	}

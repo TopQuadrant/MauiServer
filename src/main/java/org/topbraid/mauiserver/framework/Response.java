@@ -47,6 +47,10 @@ public abstract class Response {
 		}
 	}
 	
+	public boolean isOk() {
+		return status >= 200 && status < 300;
+	}
+	
 	public static class JSONResponse extends Response {
 		private final ObjectMapper json;
 		private final ObjectNode root;

@@ -38,6 +38,7 @@ public class VocabularyResource extends Resource
 		if (vocabulary == null) {
 			return request.noContent();
 		}
+		vocabulary.setNsPrefix("skos", "http://www.w3.org/2004/02/skos/core#");
 		return request.okTurtle(vocabulary);
 	}
 

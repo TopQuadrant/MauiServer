@@ -32,6 +32,10 @@ public class RecommendationResult {
 		return ids;
 	}
 	
+	public List<String> getTitles() {
+		return titles;
+	}
+	
 	public String getTitle(String recommendation) {
 		int i = ids.indexOf(recommendation);
 		if (i == -1) return null;
