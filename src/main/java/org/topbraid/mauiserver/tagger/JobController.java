@@ -58,6 +58,7 @@ public class JobController {
 				try {
 					job.run(report);
 					if (!Thread.currentThread().isInterrupted()) {
+						report.logEnd();
 						reportStore.put(report);
 					}
 				} catch (Throwable ex) {
@@ -75,7 +76,6 @@ public class JobController {
 	
 	private synchronized void unlock() {
 		if (!locked) return;
-		report.logEnd();
 		locked = false;
 		jobThread = null;
 	}

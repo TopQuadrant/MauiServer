@@ -90,6 +90,7 @@ public class JobReport {
 	
 	public void logError(String message) {
 		root.put(fieldErrorMessage, message);
+		endTime = new Date();
 	}
 	
 	public void logDocumentCounts(int total, int skipped) {
