@@ -85,9 +85,6 @@ public class Tagger {
 		this.jenaVocabulary = model;
 		this.mauiVocabulary = mauiVocabulary;
 		store.getVocabularyStore(id).put(model);
-		// Model needs to be retrained on new vocabulary, so delete the old model
-		setMauiModel(null);
-		store.getTrainerReportStore(id).delete();
 	}
 	
 	public TaggerConfiguration getConfiguration() {
