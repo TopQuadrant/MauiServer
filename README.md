@@ -57,6 +57,10 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 
 ## Version history
 
+### 1.1.1 (in development)
+- Fix a regression where training/cross-validation jobs with exception were marked complete
+- Don't automatically delete training model when vocabulary is updated
+
 ### 1.1.0 (2016-08-02)
 - Add cross-validation API to compute precision and recall
 - Make maximum number of recommendations returned per document configurable
