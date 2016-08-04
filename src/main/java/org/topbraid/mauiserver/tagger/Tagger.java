@@ -130,7 +130,8 @@ public class Tagger {
 				log.debug("Running recommender on " + text.length() + "b: " + shortText);
 			}
 			RecommendationResult result = new RecommendationResult(
-					getMauiWrapper().extractTopicsFromText(text, configuration.getMaxTopicsPerDocument()));
+					getMauiWrapper().extractTopicsFromText(text, configuration.getMaxTopicsPerDocument()),
+					configuration.getProbabilityThreshold());
 			if (log.isDebugEnabled()) {
 				log.debug("Recommendation result: " + result);
 			}

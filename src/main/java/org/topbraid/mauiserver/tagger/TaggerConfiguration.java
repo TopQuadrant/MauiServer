@@ -30,7 +30,8 @@ public class TaggerConfiguration {
 	private final String defaultLang = MauiServer.getDefaultLanguage();
 	private int crossValidationPasses = 10;
 	private int maxTopicsPerDocument = 10;
-
+	private double probabilityThreshold = 0.0;
+	
 	private final static String fieldId = "id";
 	private final static String fieldTitle = "title";
 	private final static String fieldDescription = "description";
@@ -39,6 +40,7 @@ public class TaggerConfiguration {
 	private final static String fieldStopwordsClass = "stopwords_class";
 	private final static String fieldCrossValidationPasses = "cross_validation_passes";
 	private final static String fieldMaxTopicsPerDocument = "max_topics_per_document";
+	private final static String fieldProbabilityThreshold = "probability_threshold";
 	
 	@SuppressWarnings("serial")
 	private final static Map<String,Class<? extends Stemmer>> stemmerRegistry = new HashMap<String,Class<? extends Stemmer>>() {{
@@ -181,6 +183,20 @@ public class TaggerConfiguration {
 		maxTopicsPerDocument = number;
 	}
 	
+	public double getProbabilityThreshold() {
+		return probabilityThreshold;
+	}
+	
+	public void setProbabilityThreshold(double number) {
+		if (number < 0.0) {
+			number = 0.0;
+		}
+		if (number > 1.0) {
+			number = 1.0;
+		}
+		probabilityThreshold = number;
+	}
+	
 	public ObjectNode toJSON(JsonNodeCreator factory) {
 		ObjectNode result = factory.objectNode();
 		result.put(fieldId, id);
@@ -191,6 +207,7 @@ public class TaggerConfiguration {
 		result.put(fieldStopwordsClass, stopwordsClass);
 		result.put(fieldCrossValidationPasses, crossValidationPasses);
 		result.put(fieldMaxTopicsPerDocument, maxTopicsPerDocument);
+		result.put(fieldProbabilityThreshold, probabilityThreshold);
 		return result;
 	}
 
@@ -205,6 +222,7 @@ public class TaggerConfiguration {
 		if (config.has(fieldStopwordsClass)) setStopwordsClass(config.get(fieldStopwordsClass).textValue());
 		if (config.has(fieldCrossValidationPasses)) setCrossValidationPasses(config.get(fieldCrossValidationPasses).asInt());
 		if (config.has(fieldMaxTopicsPerDocument)) setMaxTopicsPerDocument(config.get(fieldMaxTopicsPerDocument).asInt());
+		if (config.has(fieldProbabilityThreshold)) setProbabilityThreshold(config.get(fieldProbabilityThreshold).asDouble());
 	}
 
 	public static TaggerConfiguration fromJSON(JsonNode config, String defaultId, boolean ignoreIdInConfig) {

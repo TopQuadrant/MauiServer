@@ -13,11 +13,16 @@ public class RecommendationResult {
 	private List<Double> probabilities;
 	
 	public RecommendationResult(List<Topic> mauiTopics) {
+		this(mauiTopics, 0.0);
+	}
+	
+	public RecommendationResult(List<Topic> mauiTopics, double probabilityThreshold) {
 		ids = new ArrayList<String>(mauiTopics.size());
 		titles = new ArrayList<String>(mauiTopics.size());
 		probabilities = new ArrayList<Double>(mauiTopics.size());
 		for (int i = 0; i < mauiTopics.size(); i++) {
 			Topic t = mauiTopics.get(i);
+			if (t.getProbability() < probabilityThreshold) continue;
 			ids.add(t.getId());
 			titles.add(t.getTitle());
 			probabilities.add(t.getProbability());

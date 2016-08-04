@@ -143,6 +143,8 @@ Returns the tagger's configuration in JSON format.
 | stemmer_class | Qualified Java class name | Custom stemmer impementation; overrides `lang` |
 | stopword_class | Qualified Java class name | Custom stopword implementation; overrides `lang` |
 | cross_validation_passes | Integer >= 2 | Number of cross-validation passes for `xvalidate` |
+| max_topics_per_document | Integer >= 1 | Maximum number of suggestions per document |
+| probability_threshold | Double 0..1 | Minimum probability for suggested tags |
 
 #### Example request
 `curl http://localhost:8080/demo/config`
@@ -154,7 +156,9 @@ Returns the tagger's configuration in JSON format.
       "lang": "en",
       "stemmer_class": null,
       "stopwords_class": null,
-      "cross_validation_passes": 10
+      "cross_validation_passes": 10,
+      "max_topics_per_document": 10,
+      "probability_threshold": 0.05
     }
 
 ### `PUT`: Replace configuration

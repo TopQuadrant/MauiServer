@@ -62,7 +62,8 @@ public class CrossValidationJob implements AsyncJob {
 				RecommendationResult result = new RecommendationResult(
 						mauiWrapper.extractTopicsFromText(
 								trainingDoc.getText(), 
-								tagger.getConfiguration().getMaxTopicsPerDocument()));
+								tagger.getConfiguration().getMaxTopicsPerDocument()),
+						tagger.getConfiguration().getProbabilityThreshold());
 
 				// Compute precision and recall for this document
 				int correctTopicsFound = 0;
