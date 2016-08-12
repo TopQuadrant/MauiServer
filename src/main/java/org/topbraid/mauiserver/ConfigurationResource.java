@@ -74,7 +74,7 @@ public class ConfigurationResource extends Resource
 	
 	private Response createConfigResponse(Request request) {
 		JSONResponse response = request.respondJSON(HttpServletResponse.SC_OK);
-		response.getRoot().setAll(tagger.getConfiguration().toJSON(response.getRoot()));
+		response.getRoot().setAll(tagger.getConfiguration().toJSON());
 		return response;
 	}
 	

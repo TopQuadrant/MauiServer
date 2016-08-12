@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -58,7 +59,7 @@ public abstract class Response {
 		public JSONResponse(HttpServletResponse response, ObjectMapper json) {
 			super(response);
 			this.json = json;
-			this.root = json.createObjectNode();
+			this.root = JsonNodeFactory.instance.objectNode();
 		}
 
 		public ObjectNode getRoot() {

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -253,7 +254,7 @@ public class Request {
 	 */
 	private ObjectNode paramsToJSON(Map<String,String[]> params) {
 		System.out.println(params);
-		ObjectNode result = json.createObjectNode();
+		ObjectNode result = JsonNodeFactory.instance.objectNode();
 		for (String key: params.keySet()) {
 			if (params.get(key) == null) {
 				result.putNull(key);

@@ -17,7 +17,7 @@ import com.entopix.maui.stopwords.StopwordsFrench;
 import com.entopix.maui.stopwords.StopwordsGerman;
 import com.entopix.maui.stopwords.StopwordsSpanish;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeCreator;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaggerConfiguration {
@@ -197,8 +197,8 @@ public class TaggerConfiguration {
 		probabilityThreshold = number;
 	}
 	
-	public ObjectNode toJSON(JsonNodeCreator factory) {
-		ObjectNode result = factory.objectNode();
+	public ObjectNode toJSON() {
+		ObjectNode result = JsonNodeFactory.instance.objectNode();
 		result.put(fieldId, id);
 		result.put(fieldTitle, title);
 		result.put(fieldDescription, description);

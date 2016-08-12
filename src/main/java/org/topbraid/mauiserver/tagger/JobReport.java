@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JobReport {
@@ -20,8 +20,6 @@ public class JobReport {
 	private static String fieldPrecision = "precision";
 	private static String fieldRecall = "recall";
 
-	private static final ObjectMapper mapper = new ObjectMapper();
-
 	private final ObjectNode root;
 	private Date startTime = null;
 	private Date endTime = null;
@@ -31,7 +29,7 @@ public class JobReport {
 	}
 	
 	public JobReport(ObjectNode json) {
-		root = mapper.createObjectNode();
+		root = JsonNodeFactory.instance.objectNode();
 		root.put(fieldCompleted, false);
 		if (json != null) {
 			root.setAll(json);

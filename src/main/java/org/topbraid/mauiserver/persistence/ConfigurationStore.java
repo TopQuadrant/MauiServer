@@ -29,6 +29,6 @@ public class ConfigurationStore extends JSONFileStore<TaggerConfiguration> {
 
 	@Override
 	protected JsonNode encode(TaggerConfiguration config) {
-		return config.toJSON(mapper.getNodeFactory());
+		return config.toJSON();
 	}
 }
