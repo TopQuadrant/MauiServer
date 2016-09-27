@@ -57,7 +57,7 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 
 ## Version history
 
-### 1.2.0 (in development)
+### 1.2.0 (2016-09-27)
 - Make probability threshold for suggested tags configurable
 - Fix a regression where training/cross-validation jobs with exception were marked complete
 - Don't automatically delete training model when vocabulary is updated
