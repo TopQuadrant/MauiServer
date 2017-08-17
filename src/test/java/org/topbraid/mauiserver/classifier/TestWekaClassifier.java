@@ -11,7 +11,7 @@ public class TestWekaClassifier {
 
 	@Test
 	public void testSimple() throws Exception {
-		File file = new File("src/test/resources/simple.json");
+		File file = new File("src/test/resources/simple.json.txt");
 		JsonNode json = new ObjectMapper().readTree(file);
 		WekaClassifier classifier = new WekaClassifier(json);
 		
