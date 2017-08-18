@@ -1,0 +1,21 @@
+{
+	"instances" : "@relation 'Test'\n\n@attribute ex:age numeric\n@attribute ex:firstName {0,1,2}\n@attribute ex:job0 {0}\n@attribute ex:job1 {1}\n@data\n42,0,?,1\n",
+	"classAttributeIndex" : 1,
+	"paths" : [
+		"ex:age",
+		"ex:firstName",
+		"ex:job",
+		"ex:job"
+	],
+	"nodes": {
+		"ex:firstName": [
+			"\"Alice\"",
+			"\"Bob\"",
+			"\"Catalina\""
+		],
+		"ex:job" : [
+			"ex:Accountant",
+			"ex:Lawyer"
+		]
+	}
+}

@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.topbraid.mauiserver.classifier.ClassifierResource;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Server;
 import org.topbraid.mauiserver.tagger.Tagger;
@@ -68,6 +69,11 @@ public class MauiServer implements Server {
 		if (path.length == 0 || (path.length == 1 && "".equals(path[0]))) {
 			return new HomeResource(context, taggers);
 		}
+
+		if (path.length > 0 && ClassifierResource.URL_PART.equals(path[0])) {
+			return new ClassifierResource(context, path.length > 1 ? path[1] : null);
+		}
+		
 		String taggerId = path[0];
 		Tagger tagger = taggers.getTagger(TaggerResource.decodeTaggerIdFromURL(taggerId));
 		if (tagger == null) return null;
