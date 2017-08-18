@@ -1,6 +1,6 @@
 {
 	"instances" : "@relation 'Test'\n\n@attribute ex:age numeric\n@attribute ex:firstName {0,1,2}\n@attribute ex:job0 {0}\n@attribute ex:job1 {1}\n@data\n42,0,?,1\n",
-	"classIndex" : 1,
+	"classAttributeIndex" : 1,
 	"paths" : [
 		"ex:age",
 		"ex:firstName",
