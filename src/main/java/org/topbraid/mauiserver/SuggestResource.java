@@ -30,9 +30,9 @@ public class SuggestResource extends Resource implements Gettable, Postable {
 			return doSuggest(request, request.get("text"));
 		}
 		JSONResponse r = request.okJSON();
-		r.getRoot().put("title", "Tag Suggestion Service for Tagger: " + tagger.getId());
-		r.getRoot().put("usage", "GET or POST with parameter 'text' to get tag suggestions");
-		r.getRoot().put("is_ready", tagger.isTrained());
+		r.getRoot().add("title", "Tag Suggestion Service for Tagger: " + tagger.getId());
+		r.getRoot().add("usage", "GET or POST with parameter 'text' to get tag suggestions");
+		r.getRoot().add("is_ready", tagger.isTrained());
 		return r;
 	}
 	
@@ -53,7 +53,7 @@ public class SuggestResource extends Resource implements Gettable, Postable {
 		}
 		RecommendationResult recommendation = tagger.recommendTags(text);
 		JSONResponse response = request.okJSON();
-		response.getRoot().put("title", recommendation.size() + " recommendations from " + tagger.getId());
+		response.getRoot().add("title", recommendation.size() + " recommendations from " + tagger.getId());
 		recommendation.toJSON(response.getRoot());
 		return response;
 	}

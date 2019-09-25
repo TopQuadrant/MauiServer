@@ -1,8 +1,8 @@
 package org.topbraid.mauiserver.classifier;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Singleton managing access to all known classifiers.
@@ -26,8 +26,8 @@ public class WekaClassifiers {
 		return classifiers.get(key);
 	}
 	
-	public Iterator<String> iterator() {
-		return classifiers.keySet().iterator();
+	public Set<String> getKeys() {
+		return classifiers.keySet();
 	}
 	
 	public void put(String key, WekaClassifier classifier) {

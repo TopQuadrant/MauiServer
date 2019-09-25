@@ -1,11 +1,15 @@
 package org.topbraid.mauiserver.tagger;
 
+import static javax.json.Json.createArrayBuilder;
+import static org.topbraid.mauiserver.JsonUtil.createObjectBuilderThatIgnoresNulls;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
+
 import com.entopix.maui.util.Topic;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class RecommendationResult {
 	private List<String> ids;
@@ -71,15 +75,15 @@ public class RecommendationResult {
 		return s.toString();
 	}
 	
-	public void toJSON(ObjectNode root) {
-		ArrayNode results = root.arrayNode();
+	public void toJSON(JsonObjectBuilder root) {
+		JsonArrayBuilder results = createArrayBuilder();
 		for (int i = 0; i < ids.size(); i++) {
-			ObjectNode result = root.objectNode();
-			result.put("id", ids.get(i));
-			result.put("label", titles.get(i));
-			result.put("probability", probabilities.get(i));
-			results.add(result);
+			results.add(
+					createObjectBuilderThatIgnoresNulls()
+							.add("id", ids.get(i))
+							.add("label", titles.get(i))
+							.add("probability", probabilities.get(i)));
 		}
-		root.set("topics", results);
+		root.add("topics", results);
 	}
 }

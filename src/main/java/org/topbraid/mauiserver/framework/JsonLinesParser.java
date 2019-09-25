@@ -3,38 +3,37 @@ package org.topbraid.mauiserver.framework;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.json.Json;
+import javax.json.JsonValue;
+import javax.json.stream.JsonParsingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServerException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Parses an {@link InputStream} in JSON Lines (.jsonl) format and delivers an
- * iterator over the parsed {@link JsonNode}s. The input
+ * iterator over the parsed {@link JsonValue}s. The input
  * is <code>\n</code>-separated, with each line being a JSON node. 
  */
-public class JsonLinesParser implements Iterator<JsonNode> {
+public class JsonLinesParser implements Iterator<JsonValue> {
 	private static final Logger log = LoggerFactory.getLogger(JsonLinesParser.class);
 	
 	private final InputStream in;
-	private final ObjectMapper json;
 	private boolean skipBadJsonLines = false;
 	private int skippedLinesCount = 0;
 	private boolean done = false;
-	private JsonNode next = null;
+	private JsonValue next = null;
 	private int line = 0;
 	
-	public JsonLinesParser(InputStream in, ObjectMapper json) {
+	public JsonLinesParser(InputStream in) {
 		this.in = new BufferedInputStream(in);
-		this.json = json;
 	}
 
 	/**
@@ -62,9 +61,9 @@ public class JsonLinesParser implements Iterator<JsonNode> {
 	}
 	
 	@Override
-	public JsonNode next() {
+	public JsonValue next() {
 		if (!hasNext()) throw new NoSuchElementException();
-		JsonNode result = next;
+		JsonValue result = next;
 		next = null;
 		return result;
 	}
@@ -93,14 +92,14 @@ public class JsonLinesParser implements Iterator<JsonNode> {
 		}
 	}
 	
-	private JsonNode readValue() {
+	private JsonValue readValue() {
 		try {
 			String nextLine = readLine();
 			if ("".equals(nextLine)) {
 				if (done) return null;
 			}
-			return json.readTree(nextLine);
-		} catch (JsonProcessingException ex) {
+			return Json.createReader(new StringReader(nextLine)).readValue();
+		} catch (JsonParsingException ex) {
 			if (skipBadJsonLines) {
 				log.warn("Skipping line " + line + ": JSON parse error: " + ex.getMessage());
 				skippedLinesCount++;

@@ -1,22 +1,33 @@
 package org.topbraid.mauiserver.framework;
 
-import java.io.IOException;
+import static javax.json.JsonValue.ValueType.STRING;
+import static org.topbraid.mauiserver.JsonUtil.getString;
+import static org.topbraid.mauiserver.JsonUtil.hasValue;
 
+import java.io.IOException;
+import java.util.Collections;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonWriterFactory;
+import javax.json.stream.JsonGenerator;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.topbraid.mauiserver.JsonUtil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.JenaException;
 
 public abstract class Response {
 	private final static Logger log = LoggerFactory.getLogger(Response.class);
-
+	private final static JsonWriterFactory writerFactory = 
+//			Json.createWriterFactory(Collections.emptyMap());
+			Json.createWriterFactory(Collections.singletonMap(JsonGenerator.PRETTY_PRINTING, true));
+	
 	protected final HttpServletResponse http;
 	private int status = HttpServletResponse.SC_OK;
 	private String locationURL = null;
@@ -53,16 +64,14 @@ public abstract class Response {
 	}
 	
 	public static class JSONResponse extends Response {
-		private final ObjectMapper json;
-		private final ObjectNode root;
+		private final JsonObjectBuilder root;
 		
-		public JSONResponse(HttpServletResponse response, ObjectMapper json) {
+		public JSONResponse(HttpServletResponse response) {
 			super(response);
-			this.json = json;
-			this.root = JsonNodeFactory.instance.objectNode();
+			this.root = JsonUtil.createObjectBuilderThatIgnoresNulls();
 		}
 
-		public ObjectNode getRoot() {
+		public JsonObjectBuilder getRoot() {
 			return root;
 		}
 		
@@ -71,7 +80,7 @@ public abstract class Response {
 			super.send();
 			http.setContentType("application/json");
 			try {
-				json.writeValue(http.getOutputStream(), root);
+				writerFactory.createWriter(http.getOutputStream()).write(root.build());
 			} catch (IOException ex) {
 				// Probably the client disconnected
 				log.warn("Failed to write response, possibly due to client closing the connection: " + ex.getMessage());
@@ -80,11 +89,12 @@ public abstract class Response {
 		
 		@Override
 		public String getSummary() {
+			JsonObject o = root.build();
 			String message = null;
-			if (root.get("message") != null && root.get("message").asText() != null) {
-				message = root.get("message").asText();
-			} else if (root.get("title") != null && root.get("title").asText() != null) {
-				message = root.get("title").asText();
+			if (hasValue(o, "message", STRING, true)) {
+				message = getString(o, "message");
+			} else if (hasValue(o, "title", STRING, true)) {
+				message = getString(o, "title");
 			}
 			return super.getSummary() + ", json" + (message == null ? "": ": \"" + message + "\""); 
 		}
@@ -93,10 +103,10 @@ public abstract class Response {
 		public void setStatus(int status) {
 			super.setStatus(status);
 			if (status >= 300) {
-				root.put("status", status);
+				root.add("status", status);
 				String text = getStatusText(status);
 				if (text != null) {
-					root.put("status_text", text);
+					root.add("status_text", text);
 				}
 			}
 		}

@@ -59,8 +59,8 @@ public abstract class AbstractTrainingJobResource extends AbstractJobControllerR
 	@Override
 	protected JSONResponse createStatusReport(Request request) {
 		JSONResponse response = super.createStatusReport(request);
-		if ("ready".equals(response.getRoot().get("service_status").asText()) && !tagger.hasVocabulary()) {
-			response.getRoot().put("service_status", "no vocabulary");
+		if ("ready".equals(response.getRoot().build().getString("service_status")) && !tagger.hasVocabulary()) {
+			response.getRoot().add("service_status", "no vocabulary");
 		}
 		return response;
 	}

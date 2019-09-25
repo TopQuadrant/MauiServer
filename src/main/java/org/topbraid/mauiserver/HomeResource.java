@@ -1,5 +1,11 @@
 package org.topbraid.mauiserver;
 
+import static javax.json.Json.createArrayBuilder;
+import static javax.json.Json.createObjectBuilder;
+
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonStructure;
 import javax.servlet.ServletContext;
 
 import org.topbraid.mauiserver.framework.Request;
@@ -11,10 +17,6 @@ import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TaggerCollection;
 import org.topbraid.mauiserver.tagger.TaggerConfiguration;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class HomeResource extends Resource implements Gettable, Postable {
 	private TaggerCollection taggers;
@@ -31,25 +33,25 @@ public class HomeResource extends Resource implements Gettable, Postable {
 	@Override
 	public Response doGet(Request request) {
 		JSONResponse response = request.okJSON();
-		ObjectNode root = response.getRoot();
-		root.put("title", "Maui Server");
-		root.put("data_dir", taggers.getDataDir());
-		root.put("default_lang", MauiServer.getDefaultLanguage());
-		root.put("version", MauiServer.getVersion());
-		ArrayNode array = root.arrayNode();
-		root.set("taggers", array);
+		JsonArrayBuilder array = createArrayBuilder();
 		for (String id: taggers.getTaggers()) {
 			Tagger tagger = taggers.getTagger(id);
 			if (tagger == null) continue;
-			ObjectNode o = root.objectNode();
-			o.put("id", tagger.getId());
-			o.put("href", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger));
-			o.put("title", tagger.getConfiguration().getTitle());
-			if (tagger.getConfiguration().getDescription() != null) {
-				o.put("description", tagger.getConfiguration().getDescription());
-			}
+			JsonObjectBuilder o = JsonUtil.createObjectBuilderThatIgnoresNulls()
+					.add("id", tagger.getId())
+					.add("href", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger))
+					.add("title", tagger.getConfiguration().getTitle());
+				if (tagger.getConfiguration().getDescription() != null) {
+					o.add("description", tagger.getConfiguration().getDescription());
+				}
 			array.add(o);
 		}
+		response.getRoot()
+				.add("title", "Maui Server")
+				.add("data_dir", taggers.getDataDir())
+				.add("default_lang", MauiServer.getDefaultLanguage())
+				.add("version", MauiServer.getVersion())
+				.add("taggers", array);
 		return response;
 	}
 
@@ -71,7 +73,7 @@ public class HomeResource extends Resource implements Gettable, Postable {
 		try {
 			Tagger tagger = taggers.createTagger(taggerId);
 			TaggerConfiguration config = tagger.getConfiguration();
-			JsonNode json = request.getBodyJSON();
+			JsonStructure json = request.getBodyJSON();
 			if (json != null) {
 				config.updateFromJSON(json);
 			}

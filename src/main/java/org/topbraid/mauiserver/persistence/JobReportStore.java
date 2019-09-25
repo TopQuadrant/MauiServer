@@ -2,10 +2,10 @@ package org.topbraid.mauiserver.persistence;
 
 import java.io.File;
 
-import org.topbraid.mauiserver.tagger.JobReport;
+import javax.json.JsonObject;
+import javax.json.JsonStructure;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.topbraid.mauiserver.tagger.JobReport;
 
 public class JobReportStore extends JSONFileStore<JobReport> {
 	
@@ -14,12 +14,12 @@ public class JobReportStore extends JSONFileStore<JobReport> {
 	}
 
 	@Override
-	protected JobReport decode(ObjectNode json) {
+	protected JobReport decode(JsonObject json) {
 		return new JobReport(json);
 	}
 
 	@Override
-	protected JsonNode encode(JobReport report) {
-		return report.toJSON();
+	protected JsonStructure encode(JobReport report) {
+		return report.toJSON().build();
 	}
 }

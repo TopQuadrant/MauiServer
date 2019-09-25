@@ -1,8 +1,20 @@
 package org.topbraid.mauiserver.tagger;
 
+import static javax.json.JsonValue.ValueType.NUMBER;
+import static javax.json.JsonValue.ValueType.STRING;
+import static org.topbraid.mauiserver.JsonUtil.getDouble;
+import static org.topbraid.mauiserver.JsonUtil.getInt;
+import static org.topbraid.mauiserver.JsonUtil.getString;
+import static org.topbraid.mauiserver.JsonUtil.hasValue;
+import static org.topbraid.mauiserver.JsonUtil.isObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonStructure;
+
+import org.topbraid.mauiserver.JsonUtil;
 import org.topbraid.mauiserver.MauiServer;
 import org.topbraid.mauiserver.MauiServerException;
 
@@ -16,9 +28,6 @@ import com.entopix.maui.stopwords.StopwordsEnglish;
 import com.entopix.maui.stopwords.StopwordsFrench;
 import com.entopix.maui.stopwords.StopwordsGerman;
 import com.entopix.maui.stopwords.StopwordsSpanish;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaggerConfiguration {
 	private final String id;
@@ -197,44 +206,59 @@ public class TaggerConfiguration {
 		probabilityThreshold = number;
 	}
 	
-	public ObjectNode toJSON() {
-		ObjectNode result = JsonNodeFactory.instance.objectNode();
-		result.put(fieldId, id);
-		result.put(fieldTitle, title);
-		result.put(fieldDescription, description);
-		result.put(fieldLang, lang);
-		result.put(fieldStemmerClass, stemmerClass);
-		result.put(fieldStopwordsClass, stopwordsClass);
-		result.put(fieldCrossValidationPasses, crossValidationPasses);
-		result.put(fieldMaxTopicsPerDocument, maxTopicsPerDocument);
-		result.put(fieldProbabilityThreshold, probabilityThreshold);
-		return result;
+	public JsonObjectBuilder toJSON() {
+		return JsonUtil.createObjectBuilderThatIgnoresNulls()
+				.add(fieldId, id)
+				.add(fieldTitle, title)
+				.add(fieldDescription, description)
+				.add(fieldLang, lang)
+				.add(fieldStemmerClass, stemmerClass)
+				.add(fieldStopwordsClass, stopwordsClass)
+				.add(fieldCrossValidationPasses, crossValidationPasses)
+				.add(fieldMaxTopicsPerDocument, maxTopicsPerDocument)
+				.add(fieldProbabilityThreshold, probabilityThreshold);
 	}
 
-	public void updateFromJSON(JsonNode config) {
-		if (!config.isObject()) {
-			throw new MauiServerException("Configuration JSON must be an object, was " + config.getNodeType());
+	public void updateFromJSON(JsonStructure json) {
+		if (hasValue(json, fieldTitle, STRING, true)) {
+			setTitle(getString(json, fieldTitle));
 		}
-		if (config.has(fieldTitle)) setTitle(config.get(fieldTitle).textValue());
-		if (config.has(fieldDescription)) setDescription(config.get(fieldDescription).textValue());
-		if (config.has(fieldLang)) setLang(config.get(fieldLang).textValue());
-		if (config.has(fieldStemmerClass)) setStemmerClass(config.get(fieldStemmerClass).textValue());
-		if (config.has(fieldStopwordsClass)) setStopwordsClass(config.get(fieldStopwordsClass).textValue());
-		if (config.has(fieldCrossValidationPasses)) setCrossValidationPasses(config.get(fieldCrossValidationPasses).asInt());
-		if (config.has(fieldMaxTopicsPerDocument)) setMaxTopicsPerDocument(config.get(fieldMaxTopicsPerDocument).asInt());
-		if (config.has(fieldProbabilityThreshold)) setProbabilityThreshold(config.get(fieldProbabilityThreshold).asDouble());
+		if (hasValue(json, fieldDescription, STRING, true)) {
+			setDescription(getString(json, fieldDescription));
+		}
+		if (hasValue(json, fieldLang, STRING, true)) {
+			setLang(getString(json, fieldLang));
+		}
+		if (hasValue(json, fieldStemmerClass, STRING, true)) {
+			setStemmerClass(getString(json, fieldStemmerClass));
+		}
+		if (hasValue(json, fieldStopwordsClass, STRING, true)) {
+			setStopwordsClass(getString(json, fieldStopwordsClass));
+		}
+		if (hasValue(json, fieldCrossValidationPasses, NUMBER)) {
+			setCrossValidationPasses(getInt(json, fieldCrossValidationPasses));
+		}
+		if (hasValue(json, fieldMaxTopicsPerDocument, NUMBER)) {
+			setMaxTopicsPerDocument(getInt(json, fieldMaxTopicsPerDocument));
+		}
+		if (hasValue(json, fieldProbabilityThreshold, NUMBER)) {
+			setProbabilityThreshold(getDouble(json, fieldProbabilityThreshold));
+		}
 	}
 
-	public static TaggerConfiguration fromJSON(JsonNode config, String defaultId, boolean ignoreIdInConfig) {
+	public static TaggerConfiguration fromJSON(JsonStructure config, String defaultId, boolean ignoreIdInConfig) {
+		if (!isObject(config)) {
+			throw new MauiServerException("Configuration JSON must be an object, was " + config.getValueType());
+		}
 		String id;
 		if (ignoreIdInConfig) {
 			id = defaultId;
 		} else {
-			id = config.has(fieldId) ? config.get(fieldId).textValue() : defaultId;
+			id = hasValue(config, fieldId, STRING, true) ? getString(config, fieldId) : defaultId;
 		}
 		TaggerConfiguration result = new TaggerConfiguration(id);
 		result.updateFromJSON(config);
-		if (!config.has("title")) {
+		if (!hasValue(config, "title", STRING)) {
 			throw new MauiServerException("Configuration JSON must have a value for 'title'");
 		}
 		return result;

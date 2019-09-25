@@ -92,8 +92,8 @@ public abstract class AbstractJobControllerResource extends Resource implements 
 			status = "ready";
 		}
 		JSONResponse response = request.okJSON();
-		response.getRoot().put("service_status", status);
-		response.getRoot().setAll(jobController.getReport().toJSON());
+		response.getRoot().add("service_status", status);
+		response.getRoot().addAll(jobController.getReport().toJSON());
 		return response;
 	}
 }

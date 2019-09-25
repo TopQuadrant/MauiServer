@@ -2,12 +2,13 @@ package org.topbraid.mauiserver.classifier;
 
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonString;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.rules.DecisionTable;
@@ -38,33 +39,29 @@ public class WekaClassifier {
 	private Map<String,List<String>> path2Nodes = new HashMap<>();
 	
 	
-	public WekaClassifier(JsonNode jsonNode) throws Exception {
-		String instancesString = jsonNode.get("instances").textValue();
+	public WekaClassifier(JsonObject jsonNode) throws Exception {
+		String instancesString = jsonNode.getString("instances");
 		instances = new Instances(new StringReader(instancesString));
-		classAttributeIndex = jsonNode.get("classAttributeIndex").intValue();
+		classAttributeIndex = jsonNode.getInt("classAttributeIndex");
 		instances.setClassIndex(classAttributeIndex);
 		
 		classifier = new DecisionTable();
 		classifier.buildClassifier(instances);
 
-		JsonNode pathsArray = jsonNode.get("paths");
+		JsonArray pathsArray = jsonNode.getJsonArray("paths");
 		for(int i = 0; i < pathsArray.size(); i++) {
 			Attribute attribute = instances.attribute(i);
-			String path = pathsArray.get(i).textValue();
+			String path = pathsArray.getString(i);
 			attribute2Path.put(attribute, path);
 			if(!attribute.name().contains("$")) {
 				path2Attribute.put(path, attribute);
 			}
 		}
 
-		JsonNode nodesObject = jsonNode.get("nodes");
-		Iterator<String> it = nodesObject.fieldNames();
-		while(it.hasNext()) {
-			String fieldName = it.next();
-			JsonNode array = nodesObject.get(fieldName);
-			List<String> nodes = new LinkedList<>();
-			array.forEach((x) -> nodes.add(x.textValue()));
-			path2Nodes.put(fieldName, nodes);
+		JsonObject nodesObject = jsonNode.getJsonObject("nodes");
+		for (String fieldName: nodesObject.keySet()) {
+			JsonArray array = nodesObject.getJsonArray(fieldName);
+			path2Nodes.put(fieldName, new LinkedList<>(array.getValuesAs(JsonString::getString)));
 		}
 	}
 	
@@ -75,20 +72,18 @@ public class WekaClassifier {
 	 * @return the TTL serialization of an RDF node
 	 * @throws Exception
 	 */
-	public String classifyInstance(JsonNode jsonNode) throws Exception {
+	public String classifyInstance(JsonObject jsonNode) throws Exception {
 		
 		Instance instance = new Instance(instances.numAttributes());
 		instances.add(instance);
 		instance = instances.lastInstance();
 		
-		Iterator<String> fieldNames = jsonNode.fieldNames();
-		while(fieldNames.hasNext()) {
-			String fieldName = fieldNames.next();
+		for (String fieldName: jsonNode.keySet()) {
 			Attribute attribute = path2Attribute.get(fieldName);
 			List<String> nodes = path2Nodes.get(fieldName);
-			JsonNode array = jsonNode.get(fieldName);
+			JsonArray array = jsonNode.getJsonArray(fieldName);
 			for(int i = 0; i < array.size(); i++) {
-				String str = array.get(i).asText();
+				String str = array.getString(i);
 				if(nodes != null) { // Nominal
 					int index = nodes.indexOf(str);
 					if(index >= 0) {

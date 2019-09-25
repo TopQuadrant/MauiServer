@@ -1,5 +1,9 @@
 package org.topbraid.mauiserver.framework;
 
+import static java.util.Arrays.asList;
+import static javax.json.Json.createArrayBuilder;
+import static javax.json.Json.createObjectBuilder;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonStructure;
+import javax.json.stream.JsonParsingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,12 +29,6 @@ import org.topbraid.mauiserver.framework.Resource.Puttable;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.framework.Response.RDFResponse;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.JenaException;
@@ -33,10 +36,6 @@ import com.hp.hpl.jena.shared.JenaException;
 public class Request {
 	private final HttpServletRequest request;
 	private final HttpServletResponse response;
-
-	// We'll pass this ObjectMapper around and use it wherever
-	// JSON needs to be serialized.
-	private final static ObjectMapper json = new ObjectMapper();
 
 	public Request(HttpServletRequest request, HttpServletResponse response) {
 		this.request = request;
@@ -55,7 +54,7 @@ public class Request {
 	 * @return The request body parsed as JSON, or null if no request body was posted
 	 * @throws MauiServerException on JSON parse error 
 	 */
-	public JsonNode getBodyJSON() throws MauiServerException {
+	public JsonStructure getBodyJSON() throws MauiServerException {
 		try {
 			// TODO Should support application/x-www-form-urlencoded on PUT. Servlets don't do that automatically. Is there some ready-made code for parsing form-encoded bodies?
 			if ("POST".equals(request.getMethod()) && 
@@ -64,8 +63,8 @@ public class Request {
 			}
 			InputStream in = getBodyInputStream();
 			if (in == null) return null;
-			return json.readTree(in);
-		} catch (JsonProcessingException ex) {
+			return Json.createReader(in).read();
+		} catch (JsonParsingException ex) {
 			throw new MauiServerException("Could not parse request body as JSON: " + ex.getMessage(), ex);
 		} catch (IOException ex) {
 			throw new MauiServerException("Could not read request body: " + ex.getMessage(), ex);
@@ -76,7 +75,7 @@ public class Request {
 		try {
 			InputStream in = getBodyInputStream();
 			if (in == null) return null;
-			JsonLinesParser result = new JsonLinesParser(in, json);
+			JsonLinesParser result = new JsonLinesParser(in);
 			result.setSkipBadJsonLines(skipJsonSyntaxErrors);
 			return result;
 		} catch (IOException ex) {
@@ -146,7 +145,7 @@ public class Request {
 	}
 	
 	public JSONResponse respondJSON(int status) {
-		JSONResponse result = new JSONResponse(response, json);
+		JSONResponse result = new JSONResponse(response);
 		result.setStatus(status);
 		return result;
 	}
@@ -174,8 +173,8 @@ public class Request {
 	public Response seeOther(String url, String message) {
 		JSONResponse r = respondJSON(HttpServletResponse.SC_SEE_OTHER);
 		r.setRedirectLocation(url);
-		r.getRoot().put("href", url);
-		r.getRoot().put("message", message);
+		r.getRoot().add("href", url);
+		r.getRoot().add("message", message);
 		return r;
 	}
 	
@@ -190,18 +189,18 @@ public class Request {
 	public Response badRequest(String field, String value, String message) {
 		JSONResponse r = respondJSON(HttpServletResponse.SC_BAD_REQUEST);
 		if (field != null) {
-			r.getRoot().put("field", field);
+			r.getRoot().add("field", field);
 		}
 		if (value != null) {
-			r.getRoot().put("value", value);
+			r.getRoot().add("value", value);
 		}
-		r.getRoot().put("message", message);
+		r.getRoot().add("message", message);
 		return r;
 	}
 
 	public Response notFound() {
 		JSONResponse r = respondJSON(HttpServletResponse.SC_NOT_FOUND);
-		r.getRoot().put("message", "The resource does not exist");
+		r.getRoot().add("message", "The resource does not exist");
 		return r;
 	}
 	
@@ -220,13 +219,9 @@ public class Request {
 		}
 		JSONResponse r = respondJSON(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 		r.setHeader("Allow", StringUtils.join(allowedMethods, ", "));
-		r.getRoot().put("message", "HTTP method " + unsupportedMethod + 
+		r.getRoot().add("message", "HTTP method " + unsupportedMethod + 
 				" not supported on this resource");
-		ArrayNode list = r.getRoot().arrayNode();
-		for (String method: allowedMethods) {
-			list.add(method);
-		}
-		r.getRoot().set("allowed_methods", list);
+		r.getRoot().add("allowed_methods", createArrayBuilder(allowedMethods));
 		return r;
 	}
 	
@@ -236,15 +231,15 @@ public class Request {
 		ex.printStackTrace(pw);
 		pw.flush();
 		JSONResponse r = respondJSON(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		r.getRoot().put("message", 
+		r.getRoot().add("message", 
 				ex.getMessage() == null ? "General server error" : ex.getMessage());
-		r.getRoot().put("stacktrace", stack.toString());
+		r.getRoot().add("stacktrace", stack.toString());
 		return r;
 	}
 	
 	public Response conflict(String error) {
 		JSONResponse r = respondJSON(HttpServletResponse.SC_CONFLICT);
-		r.getRoot().put("message", error);
+		r.getRoot().add("message", error);
 		return r;
 	}
 	
@@ -252,27 +247,23 @@ public class Request {
 	 * Converts a parameter map (such as returned by {@link HttpServletRequest#getParameterMap()})
 	 * to a JSON object. Parameters with multiple values are converted to a JSON array. 
 	 */
-	private ObjectNode paramsToJSON(Map<String,String[]> params) {
+	private JsonObject paramsToJSON(Map<String,String[]> params) {
 		System.out.println(params);
-		ObjectNode result = JsonNodeFactory.instance.objectNode();
+		JsonObjectBuilder result = createObjectBuilder();
 		for (String key: params.keySet()) {
 			if (params.get(key) == null) {
-				result.putNull(key);
+				result.addNull(key);
 			} else if (params.get(key).length == 1) {
 				String value = params.get(key)[0];
 				if ("".equals(value)) {
-					result.putNull(key);
+					result.addNull(key);
 				} else {
-					result.put(key, value);
+					result.add(key, value);
 				}
 			} else {
-				ArrayNode values = result.arrayNode();
-				for (String value: params.get(key)) {
-					values.add(value);
-				}
-				result.set(key, values);
+				result.add(key, createArrayBuilder(asList(params.get(key))));
 			}
 		}
-		return result;
+		return result.build();
 	}
 }

@@ -1,5 +1,8 @@
 package org.topbraid.mauiserver;
 
+import static org.topbraid.mauiserver.JsonUtil.isObject;
+
+import javax.json.JsonStructure;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,8 +16,6 @@ import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TaggerConfiguration;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class ConfigurationResource extends Resource
 		implements Gettable, Postable, Puttable, Deletable {
@@ -38,8 +39,8 @@ public class ConfigurationResource extends Resource
 	@Override
 	public Response doPut(Request request) {
 		try {
-			JsonNode json = request.getBodyJSON();
-			if (json == null) {
+			JsonStructure json = request.getBodyJSON();
+			if (json == null || !isObject(json)) {
 				return request.badRequest("Configuration in JSON format must be sent in request body");
 			}
 			tagger.setConfiguration(TaggerConfiguration.fromJSON(json, tagger.getId(), true));
@@ -52,8 +53,8 @@ public class ConfigurationResource extends Resource
 	@Override
 	public Response doPost(Request request) {
 		try {
-			JsonNode json = request.getBodyJSON();
-			if (json == null) {
+			JsonStructure json = request.getBodyJSON();
+			if (json == null || !isObject(json)) {
 				return request.badRequest("Configuration in JSON format must be sent in request body");
 			}
 			TaggerConfiguration config = tagger.getConfiguration();
@@ -74,7 +75,7 @@ public class ConfigurationResource extends Resource
 	
 	private Response createConfigResponse(Request request) {
 		JSONResponse response = request.respondJSON(HttpServletResponse.SC_OK);
-		response.getRoot().setAll(tagger.getConfiguration().toJSON());
+		response.getRoot().addAll(tagger.getConfiguration().toJSON());
 		return response;
 	}
 	

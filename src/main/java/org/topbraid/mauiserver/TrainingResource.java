@@ -38,11 +38,11 @@ public class TrainingResource extends AbstractTrainingJobResource {
 
 		// We trust the model store more than the report;
 		// more importantly, this ensures that completed and is_trained have same value
-		response.getRoot().put("completed", tagger.isTrained());
+		response.getRoot().add("completed", tagger.isTrained());
 		// Deprecated legacy field; now "completed"
-		response.getRoot().put("is_trained", tagger.isTrained());
+		response.getRoot().add("is_trained", tagger.isTrained());
 		// Deprecated legacy field; now "job_status"
-		response.getRoot().put("training_status", response.getRoot().get("service_status").asText());
+		response.getRoot().add("training_status", response.getRoot().build().getString("service_status"));
 		return response;
 	}
 	

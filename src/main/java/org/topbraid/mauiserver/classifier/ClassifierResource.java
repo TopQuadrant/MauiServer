@@ -1,9 +1,13 @@
 package org.topbraid.mauiserver.classifier;
 
-import java.util.Iterator;
+import static javax.json.Json.createArrayBuilder;
+import static org.topbraid.mauiserver.JsonUtil.asObject;
+import static org.topbraid.mauiserver.JsonUtil.isObject;
 
+import javax.json.JsonStructure;
 import javax.servlet.ServletContext;
 
+import org.topbraid.mauiserver.JsonUtil;
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Resource.Deletable;
@@ -12,11 +16,6 @@ import org.topbraid.mauiserver.framework.Resource.Postable;
 import org.topbraid.mauiserver.framework.Resource.Puttable;
 import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * Example Ajax calls:
@@ -59,13 +58,7 @@ public class ClassifierResource extends Resource implements Deletable, Gettable,
 	public Response doGet(Request request) {
 		if(classifierKey == null) {
 			JSONResponse response = request.okJSON();
-			ObjectNode root = response.getRoot();
-			ArrayNode array = root.arrayNode();
-			Iterator<String> it = WekaClassifiers.get().iterator();
-			while(it.hasNext()) {
-				array.add(it.next());
-			}
-			root.set("classifiers", array);
+			response.getRoot().add("classifiers", createArrayBuilder(WekaClassifiers.get().getKeys()));
 			return response;
 		}
 		return null;
@@ -81,13 +74,15 @@ public class ClassifierResource extends Resource implements Deletable, Gettable,
 		if(classifierKey == null) {
 			return request.badRequest("Unknown classifier with key " + classifierKey);
 		}
-		JsonNode json = request.getBodyJSON();
+		JsonStructure json = request.getBodyJSON();
+		if (json == null || !isObject(json)) {
+			return request.badRequest("Instance must be sent as JSON object in request body");
+		}
 		try {
-			String nodeString = classifier.classifyInstance(json);
+			String nodeString = classifier.classifyInstance(JsonUtil.asObject(json));
 			JSONResponse response = request.okJSON();
 			if(nodeString != null) {
-				ObjectNode root = response.getRoot();
-				root.set("node", new TextNode(nodeString));
+				response.getRoot().add("node", nodeString);
 			}
 			return response;
 		}
@@ -104,8 +99,11 @@ public class ClassifierResource extends Resource implements Deletable, Gettable,
 			return request.badRequest("Missing classifier key");
 		}
 		try {
-			JsonNode json = request.getBodyJSON();
-			WekaClassifier classifier = new WekaClassifier(json);
+			JsonStructure json = request.getBodyJSON();
+			if (json == null || !isObject(json)) {
+				request.badRequest("Classifier definition must be sent as JSON object in request body");
+			}
+			WekaClassifier classifier = new WekaClassifier(asObject(json));
 			WekaClassifiers.get().put(classifierKey, classifier);
 			return request.okJSON();
 		}

@@ -1,13 +1,21 @@
 package org.topbraid.mauiserver.tagger;
 
+import static javax.json.JsonValue.ValueType.NUMBER;
+import static javax.json.JsonValue.ValueType.STRING;
+import static org.topbraid.mauiserver.JsonUtil.createObjectBuilderThatIgnoresNulls;
+import static org.topbraid.mauiserver.JsonUtil.getInt;
+import static org.topbraid.mauiserver.JsonUtil.getString;
+import static org.topbraid.mauiserver.JsonUtil.hasValue;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 public class JobReport {
 	private static String fieldCompleted = "completed";
@@ -20,7 +28,7 @@ public class JobReport {
 	private static String fieldPrecision = "precision";
 	private static String fieldRecall = "recall";
 
-	private final ObjectNode root;
+	private final JsonObjectBuilder root;
 	private Date startTime = null;
 	private Date endTime = null;
 
@@ -28,23 +36,24 @@ public class JobReport {
 		this(null);
 	}
 	
-	public JobReport(ObjectNode json) {
-		root = JsonNodeFactory.instance.objectNode();
-		root.put(fieldCompleted, false);
+	public JobReport(JsonObject json) {
+		root = createObjectBuilderThatIgnoresNulls()
+				.add(fieldCompleted, false);
 		if (json != null) {
-			root.setAll(json);
+			root.addAll(Json.createObjectBuilder(json));
 		}
-		if (root.has(fieldStartTime)) {
-			startTime = parseDate(root.get(fieldStartTime).textValue());
+		if (hasValue(json, fieldStartTime, STRING)) {
+			startTime = parseDate(getString(json, fieldStartTime));
 		}
-		if (root.has(fieldEndTime)) {
-			endTime = parseDate(root.get(fieldEndTime).textValue());
+		if (hasValue(json, fieldEndTime, STRING)) {
+			endTime = parseDate(getString(json, fieldEndTime));
 		}
 	}
 	
 	public String getErrorMessage() {
-		if (root.has(fieldErrorMessage)) {
-			return root.get(fieldErrorMessage).textValue();
+		JsonObject o = root.build();
+		if (hasValue(o, fieldErrorMessage, STRING)) {
+			return getString(o, fieldErrorMessage);
 		}
 		return null;
 	}
@@ -64,15 +73,17 @@ public class JobReport {
 	}
 	
 	public int getTrainingDocumentCount() {
-		if (root.has(fieldDocuments)) {
-			return root.get(fieldDocuments).asInt(-1);
+		JsonObject o = root.build();
+		if (hasValue(o, fieldDocuments, NUMBER)) {
+			return getInt(o, fieldDocuments, -1);
 		}
 		return -1;
 	}
 	
 	public int getSkippedTrainingDocumentCount() {
-		if (root.has(fieldSkipped)) {
-			return root.get(fieldSkipped).asInt(-1);
+		JsonObject o = root.build();
+		if (hasValue(o, fieldSkipped, NUMBER)) {
+			return getInt(o, fieldSkipped, -1);
 		}
 		return -1;
 	}
@@ -82,38 +93,38 @@ public class JobReport {
 	}
 	
 	public void logEnd() {
-		root.put(fieldCompleted, true);
+		root.add(fieldCompleted, true);
 		endTime = new Date();
 	}
 	
 	public void logError(String message) {
-		root.put(fieldErrorMessage, message);
+		root.add(fieldErrorMessage, message);
 		endTime = new Date();
 	}
 	
 	public void logDocumentCounts(int total, int skipped) {
 		if (total >= 0) {
-			root.put(fieldDocuments, total);
+			root.add(fieldDocuments, total);
 		}
 		if (skipped >= 0) {
-			root.put(fieldSkipped, skipped);
+			root.add(fieldSkipped, skipped);
 		}
 	}
 	
 	public void logPrecisionAndRecall(double precision, double recall) {
-		root.put(fieldPrecision, precision);
-		root.put(fieldRecall, recall);
+		root.add(fieldPrecision, precision);
+		root.add(fieldRecall, recall);
 	}
 	
-	public ObjectNode toJSON() {
+	public JsonObjectBuilder toJSON() {
 		if (startTime != null) {
-			root.put(fieldStartTime, formatDate(startTime));
+			root.add(fieldStartTime, formatDate(startTime));
 		}
 		if (endTime != null) {
-			root.put(fieldEndTime, formatDate(endTime));
+			root.add(fieldEndTime, formatDate(endTime));
 		}
 		if (getRuntime() >= 0) {
-			root.put(fieldRuntimeMillis, getRuntime());
+			root.add(fieldRuntimeMillis, getRuntime());
 		}
 		return root;
 	}

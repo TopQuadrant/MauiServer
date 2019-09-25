@@ -1,5 +1,7 @@
 package org.topbraid.mauiserver;
 
+import static org.topbraid.mauiserver.JsonUtil.createObjectBuilderThatIgnoresNulls;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -16,7 +18,6 @@ import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TaggerCollection;
 
 import com.entopix.maui.vocab.VocabularyStore;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaggerResource extends Resource implements Gettable, Deletable {
 	private final TaggerCollection taggers;
@@ -35,30 +36,29 @@ public class TaggerResource extends Resource implements Gettable, Deletable {
 	@Override
 	public Response doGet(Request request) {
 		JSONResponse r = request.okJSON();
-		r.getRoot().put("title", tagger.getConfiguration().getTitle());
+		r.getRoot()
+				.add("title", tagger.getConfiguration().getTitle())
+				.add("id", tagger.getId())
+				.add("is_trained", tagger.isTrained())
+				.add("has_vocabulary", tagger.hasVocabulary())
+				.add("links", createObjectBuilderThatIgnoresNulls()
+						.add("home", getContextPath() + "/")
+						.add("tagger", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger))
+						.add("config", getContextPath() + ConfigurationResource.getRelativeConfigurationURL(tagger))
+						.add("vocab", getContextPath() + VocabularyResource.getRelativeVocabularyURL(tagger))
+						.add("train", getContextPath() + TrainingResource.getRelativeTrainingURL(tagger))
+						.add("suggest", getContextPath() + SuggestResource.getRelativeSuggesterURL(tagger))
+						.add("xvalidate", getContextPath() + CrossValidationResource.getRelativeCrossValidationURL(tagger)));
 		if (tagger.getConfiguration().getDescription() != null) {
-			r.getRoot().put("description", tagger.getConfiguration().getDescription());
+			r.getRoot().add("description", tagger.getConfiguration().getDescription());
 		}
-		r.getRoot().put("id", tagger.getId());
-		r.getRoot().put("is_trained", tagger.isTrained());
-		r.getRoot().put("has_vocabulary", tagger.hasVocabulary());
 		if (tagger.hasVocabulary()) {
 			VocabularyStore store = tagger.getVocabularyMaui().getVocabularyStore();
-			ObjectNode stats = r.getRoot().objectNode();
-			stats.put("num_concepts", store.getNumTerms());
-			stats.put("num_altlabels", store.getNumNonDescriptors());
-			stats.put("num_concepts_with_relationships", store.getNumRelatedTerms());
-			r.getRoot().set("vocab_stats", stats);
+			r.getRoot().add("vocab_stats", createObjectBuilderThatIgnoresNulls()
+					.add("num_concepts", store.getNumTerms())
+					.add("num_altlabels", store.getNumNonDescriptors())
+					.add("num_concepts_with_relationships", store.getNumRelatedTerms()));
 		}
-		ObjectNode links = r.getRoot().objectNode();
-		links.put("home", getContextPath() + "/");
-		links.put("tagger", getContextPath() + TaggerResource.getRelativeTaggerURL(tagger));
-		links.put("config", getContextPath() + ConfigurationResource.getRelativeConfigurationURL(tagger));
-		links.put("vocab", getContextPath() + VocabularyResource.getRelativeVocabularyURL(tagger));
-		links.put("train", getContextPath() + TrainingResource.getRelativeTrainingURL(tagger));
-		links.put("suggest", getContextPath() + SuggestResource.getRelativeSuggesterURL(tagger));
-		links.put("xvalidate", getContextPath() + CrossValidationResource.getRelativeCrossValidationURL(tagger));
-		r.getRoot().set("links", links);
 		return r;
 	}
 

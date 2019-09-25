@@ -1,13 +1,20 @@
 package org.topbraid.mauiserver.tagger;
 
+import static org.topbraid.mauiserver.JsonUtil.getString;
+import static org.topbraid.mauiserver.JsonUtil.hasValue;
+import static org.topbraid.mauiserver.JsonUtil.isObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+import javax.json.JsonValue.ValueType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.topbraid.mauiserver.JsonUtil;
 import org.topbraid.mauiserver.framework.JsonLinesParser;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Parses training documents in JSON Lines (.jsonl) format. Each line is a
@@ -34,7 +41,7 @@ public class TrainingDataParser {
 	public List<TrainingDocument> getCorpus() {
 		List<TrainingDocument> results = new ArrayList<TrainingDocument>();
 		while (in.hasNext()) {
-			JsonNode json = in.next();
+			JsonValue json = in.next();
 			int line = in.getLineNumber();
 			TrainingDocument doc = toTrainingDocument(json, line);
 			if (doc == null) continue;
@@ -42,33 +49,35 @@ public class TrainingDataParser {
 		}
 		return results;
 	}
-	
-	private TrainingDocument toTrainingDocument(JsonNode json, int line) {
+
+	private TrainingDocument toTrainingDocument(JsonValue json, int line) {
 		String id = "doc-" + line;
-		if (json.isArray()) {
+		if (!isObject(json)) {
 			logSkipDocument("doc-" + line, "Not a JSON object");
 			return null;
 		}
-		if (json.has("id") && !"".equals(json.get("id").asText())) {
-			id = json.get("id").asText();
+		JsonObject doc = json.asJsonObject();
+		if (hasValue(doc, "id", ValueType.STRING, true)) {
+			id = doc.getString("id");
 		}
-		if (!json.has("content") || "".equals(json.get("content").asText())) {
+		if (!hasValue(doc, "content", ValueType.STRING, true)) {
 			logSkipDocument(id, "Field 'content' missing, empty, or not a string");
 			return null;
 		}
-		String textContent = json.get("content").asText();
-		if (!json.has("topics") || !json.get("topics").isArray() || json.get("topics").size() == 0) {
+		String textContent = getString(doc, "content");
+		if (!hasValue(doc, "topics", ValueType.ARRAY, true)) {
 			logSkipDocument(id, "Field 'topics' missing, empty, or not an array");
 			return null;
 		}
 		List<String> topics = new ArrayList<String>();
 		int skippedTopics = 0;
-		for (JsonNode topic: json.get("topics")) {
-			if (!topic.isTextual() || "".equals(topic.asText())) {
+		for (JsonValue topic: doc.getJsonArray("topics")) {
+			String s = JsonUtil.asString(topic);
+			if (s == null || "".equals(s)) {
 				skippedTopics++;
 				continue;
 			}
-			topics.add(topic.asText());
+			topics.add(s);
 		}
 		if (topics.isEmpty()) {
 			logSkipDocument(id, "All " + skippedTopics + " topics were invalid (non-string)");
