@@ -57,6 +57,11 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 
 ## Version history
 
+### 1.3.0 (2019-09-27)
+- Add WEKA classifier API
+- Update various libraries
+- Require Java 8
+
 ### 1.2.1 (2016-12-18)
 - Patch maui.war to turn off unhelpful logging to ./out/learning.log
 
