@@ -81,19 +81,23 @@ public abstract class AbstractJobControllerResource extends Resource implements 
 		jobController.reset();
 		return createStatusReport(request);
 	}
+
+	protected String getServiceStatus() {
+		if (jobController.isLocked()) {
+			return "running";
+		} else if (jobController.isFailed()) {
+			return "error";
+		} else if (jobController.isReady()) {
+			return "ready";
+		}
+		throw new IllegalStateException("Can't happen");
+	}
 	
 	protected JSONResponse createStatusReport(Request request) {
-		String status;
-		if (jobController.isLocked()) {
-			status = "running";
-		} else if (jobController.isFailed()) {
-			status = "error";
-		} else {
-			status = "ready";
-		}
 		JSONResponse response = request.okJSON();
-		response.getRoot().add("service_status", status);
-		response.getRoot().addAll(jobController.getReport().toJSON());
+		response.getRoot()
+				.add("service_status", getServiceStatus())
+				.addAll(jobController.getReport().toJSON());
 		return response;
 	}
 }

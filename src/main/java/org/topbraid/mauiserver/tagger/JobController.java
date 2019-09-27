@@ -50,6 +50,10 @@ public class JobController {
 		return report.getErrorMessage() != null;
 	}
 
+	public boolean isReady() {
+		return !isLocked() && !isFailed();
+	}
+	
 	public void startJob(final AsyncJob job) {
 		if (!locked) throw new IllegalStateException("Must lock() before starting " + job.getActivityName() + " job");
 		jobThread = new Thread(new Runnable() {

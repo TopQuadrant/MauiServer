@@ -126,7 +126,7 @@ public class JobReport {
 		if (getRuntime() >= 0) {
 			root.add(fieldRuntimeMillis, getRuntime());
 		}
-		return root;
+		return Json.createObjectBuilder().addAll(root);
 	}
 
 	private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");

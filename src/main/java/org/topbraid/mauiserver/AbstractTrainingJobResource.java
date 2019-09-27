@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 import org.topbraid.mauiserver.framework.JsonLinesParser;
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Response;
-import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.tagger.AsyncJob;
 import org.topbraid.mauiserver.tagger.JobController;
 import org.topbraid.mauiserver.tagger.JobReport;
@@ -57,11 +56,11 @@ public abstract class AbstractTrainingJobResource extends AbstractJobControllerR
 	}
 
 	@Override
-	protected JSONResponse createStatusReport(Request request) {
-		JSONResponse response = super.createStatusReport(request);
-		if ("ready".equals(response.getRoot().build().getString("service_status")) && !tagger.hasVocabulary()) {
-			response.getRoot().add("service_status", "no vocabulary");
+	protected String getServiceStatus() {
+		String status = super.getServiceStatus();
+		if ("ready".equals(status) && !tagger.hasVocabulary()) {
+			return "no vocabulary";
 		}
-		return response;
+		return status;
 	}
 }

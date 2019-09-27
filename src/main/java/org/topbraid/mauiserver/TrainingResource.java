@@ -42,7 +42,7 @@ public class TrainingResource extends AbstractTrainingJobResource {
 		// Deprecated legacy field; now "completed"
 		response.getRoot().add("is_trained", tagger.isTrained());
 		// Deprecated legacy field; now "job_status"
-		response.getRoot().add("training_status", response.getRoot().build().getString("service_status"));
+		response.getRoot().add("training_status", getServiceStatus());
 		return response;
 	}
 	

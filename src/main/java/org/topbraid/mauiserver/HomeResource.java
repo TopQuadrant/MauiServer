@@ -1,7 +1,6 @@
 package org.topbraid.mauiserver;
 
 import static javax.json.Json.createArrayBuilder;
-import static javax.json.Json.createObjectBuilder;
 
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;

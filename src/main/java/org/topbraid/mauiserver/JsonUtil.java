@@ -198,7 +198,7 @@ public class JsonUtil {
 					JsonObject o = builder.build();
 					for (String key: o.keySet()) {
 						JsonValue value = o.get(key);
-						if (value.getValueType() == ValueType.NULL) continue;
+						if (value == null || value.getValueType() == ValueType.NULL) continue;
 						add(key, value);
 					}
 				}
