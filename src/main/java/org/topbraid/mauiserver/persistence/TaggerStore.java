@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServerException;
@@ -17,7 +18,6 @@ import org.topbraid.mauiserver.tagger.JobReport;
 import org.topbraid.mauiserver.tagger.TaggerConfiguration;
 
 import com.entopix.maui.filters.MauiFilter;
-import com.hp.hpl.jena.rdf.model.Model;
 
 public class TaggerStore {
 	private static final Logger log = LoggerFactory.getLogger(TaggerStore.class);

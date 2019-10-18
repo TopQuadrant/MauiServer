@@ -1,5 +1,6 @@
 package org.topbraid.mauiserver.tagger;
 
+import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServerException;
@@ -8,7 +9,6 @@ import org.topbraid.mauiserver.persistence.TaggerStore;
 import com.entopix.maui.filters.MauiFilter;
 import com.entopix.maui.main.MauiWrapper;
 import com.entopix.maui.vocab.Vocabulary;
-import com.hp.hpl.jena.rdf.model.Model;
 
 public class Tagger {
 	private final static Logger log = LoggerFactory.getLogger(Tagger.class);
