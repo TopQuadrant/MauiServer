@@ -12,12 +12,14 @@ import com.entopix.maui.stemmers.GermanStemmer;
 import com.entopix.maui.stemmers.PorterStemmer;
 import com.entopix.maui.stemmers.SpanishStemmer;
 import com.entopix.maui.stemmers.Stemmer;
+import com.entopix.maui.stemmers.SwedishStemmer;
 import com.entopix.maui.stopwords.Stopwords;
 import com.entopix.maui.stopwords.StopwordsEnglish;
 import com.entopix.maui.stopwords.StopwordsFinnish;
 import com.entopix.maui.stopwords.StopwordsFrench;
 import com.entopix.maui.stopwords.StopwordsGerman;
 import com.entopix.maui.stopwords.StopwordsSpanish;
+import com.entopix.maui.stopwords.StopwordsSwedish;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -51,6 +53,7 @@ public class TaggerConfiguration {
 		put("de", GermanStemmer.class);
 		put("es", SpanishStemmer.class);
 		put("fi", CachingFinnishStemmer.class);
+		put("sv", SwedishStemmer.class);
 	}};
 	
 	@SuppressWarnings("serial")
@@ -60,6 +63,7 @@ public class TaggerConfiguration {
 		put("de", StopwordsGerman.class);
 		put("es", StopwordsSpanish.class);
 		put("fi", StopwordsFinnish.class);
+		put("sv", StopwordsSwedish.class);
 	}};
 	
 	public TaggerConfiguration(String id) {
