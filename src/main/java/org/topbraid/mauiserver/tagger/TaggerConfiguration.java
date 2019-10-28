@@ -6,6 +6,7 @@ import java.util.Map;
 import org.topbraid.mauiserver.MauiServer;
 import org.topbraid.mauiserver.MauiServerException;
 
+import com.entopix.maui.stemmers.CachingFinnishStemmer;
 import com.entopix.maui.stemmers.FrenchStemmer;
 import com.entopix.maui.stemmers.GermanStemmer;
 import com.entopix.maui.stemmers.PorterStemmer;
@@ -13,6 +14,7 @@ import com.entopix.maui.stemmers.SpanishStemmer;
 import com.entopix.maui.stemmers.Stemmer;
 import com.entopix.maui.stopwords.Stopwords;
 import com.entopix.maui.stopwords.StopwordsEnglish;
+import com.entopix.maui.stopwords.StopwordsFinnish;
 import com.entopix.maui.stopwords.StopwordsFrench;
 import com.entopix.maui.stopwords.StopwordsGerman;
 import com.entopix.maui.stopwords.StopwordsSpanish;
@@ -48,6 +50,7 @@ public class TaggerConfiguration {
 		put("fr", FrenchStemmer.class);
 		put("de", GermanStemmer.class);
 		put("es", SpanishStemmer.class);
+		put("fi", CachingFinnishStemmer.class);
 	}};
 	
 	@SuppressWarnings("serial")
@@ -56,6 +59,7 @@ public class TaggerConfiguration {
 		put("fr", StopwordsFrench.class);
 		put("de", StopwordsGerman.class);
 		put("es", StopwordsSpanish.class);
+		put("fi", StopwordsFinnish.class);
 	}};
 	
 	public TaggerConfiguration(String id) {
