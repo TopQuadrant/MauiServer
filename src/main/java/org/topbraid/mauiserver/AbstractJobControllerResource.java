@@ -67,7 +67,7 @@ public abstract class AbstractJobControllerResource extends Resource implements 
 		} catch (MauiServerException ex) {
 			jobController.cancel();
 			return request.badRequest(ex.getMessage());
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			jobController.cancel();
 			throw ex;
 		}
