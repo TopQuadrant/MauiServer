@@ -17,7 +17,7 @@ import org.topbraid.mauiserver.tagger.JobReport;
 import org.topbraid.mauiserver.tagger.TaggerConfiguration;
 
 import com.entopix.maui.filters.MauiFilter;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 public class TaggerStore {
 	private static final Logger log = LoggerFactory.getLogger(TaggerStore.class);
@@ -109,7 +109,10 @@ public class TaggerStore {
 	}
 	
 	public ObjectStore<MauiFilter> getMauiModelStore(String taggerId) {
-		return new MauiModelStore(taggerId, getTaggerFile(taggerId, "model.maui"));
+		// We change the file extension when the Maui binary format changes.
+		// This is a simple way to force re-training when the existing model
+		// can no longer be read.
+		return new MauiModelStore(taggerId, getTaggerFile(taggerId, "model.maui14"));
 	}
 	
 	public ObjectStore<JobReport> getTrainerReportStore(String taggerId) {
