@@ -1,0 +1,7 @@
+*	eol=lf	autocrlf=input
+*.java	text
+*.js	text
+*.md	text
+*.properties	text
+*.txt	text
+*.xml	text
