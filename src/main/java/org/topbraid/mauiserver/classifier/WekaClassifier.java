@@ -12,8 +12,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import weka.classifiers.Classifier;
 import weka.classifiers.rules.DecisionTable;
 import weka.core.Attribute;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 
 /**
  * Encapsulates a Weka Classifier together with other background info about how it was
@@ -77,7 +79,7 @@ public class WekaClassifier {
 	 */
 	public String classifyInstance(JsonNode jsonNode) throws Exception {
 		
-		Instance instance = new Instance(instances.numAttributes());
+		Instance instance = new DenseInstance(instances.numAttributes());
 		instances.add(instance);
 		instance = instances.lastInstance();
 		
@@ -116,7 +118,7 @@ public class WekaClassifier {
 		System.out.println("Classifying Instance: " + instance);
 		
 		double value = classifier.classifyInstance(instance);
-		if(Instance.isMissingValue(value)) {
+		if(Utils.isMissingValue(value)) {
 			return null;
 		}
 		Attribute attribute = instances.attribute(classAttributeIndex);

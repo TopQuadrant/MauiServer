@@ -57,8 +57,10 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 
 ## Version history
 
-### 1.3.1 (in development)
-- TODO
+### 1.4.0 (in development)
+- Update various libraries
+- Require Java 11
+- Re-training of all existing taggers is required due to major WEKA version update
 
 ### 1.3.0 (2019-09-27)
 - Add WEKA classifier API

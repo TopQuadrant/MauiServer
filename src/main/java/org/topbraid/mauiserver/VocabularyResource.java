@@ -14,7 +14,7 @@ import org.topbraid.mauiserver.tagger.Tagger;
 
 import com.entopix.maui.vocab.Vocabulary;
 import com.entopix.maui.vocab.VocabularyStore;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 public class VocabularyResource extends Resource
 		implements Gettable, Puttable, Deletable {
