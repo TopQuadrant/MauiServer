@@ -2,8 +2,6 @@ package org.topbraid.mauiserver.classifier;
 
 import java.util.Iterator;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Resource.Deletable;
@@ -17,6 +15,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Example Ajax calls:

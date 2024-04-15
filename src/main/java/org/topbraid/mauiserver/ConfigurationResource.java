@@ -1,8 +1,5 @@
 package org.topbraid.mauiserver;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
-
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Resource.Deletable;
@@ -15,6 +12,9 @@ import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TaggerConfiguration;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class ConfigurationResource extends Resource
 		implements Gettable, Postable, Puttable, Deletable {

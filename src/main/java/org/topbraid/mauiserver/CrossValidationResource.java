@@ -2,13 +2,13 @@ package org.topbraid.mauiserver;
 
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.tagger.AsyncJob;
 import org.topbraid.mauiserver.tagger.CrossValidationJob;
 import org.topbraid.mauiserver.tagger.JobReport;
 import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TrainingDocument;
+
+import jakarta.servlet.ServletContext;
 
 public class CrossValidationResource extends AbstractTrainingJobResource {
 	private final Tagger tagger;

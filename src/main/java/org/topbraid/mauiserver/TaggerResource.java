@@ -4,8 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Resource.Deletable;
@@ -17,6 +15,8 @@ import org.topbraid.mauiserver.tagger.TaggerCollection;
 
 import com.entopix.maui.vocab.VocabularyStore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.servlet.ServletContext;
 
 public class TaggerResource extends Resource implements Gettable, Deletable {
 	private final TaggerCollection taggers;

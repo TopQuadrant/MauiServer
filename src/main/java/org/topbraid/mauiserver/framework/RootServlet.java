@@ -2,12 +2,6 @@ package org.topbraid.mauiserver.framework;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.MauiServer;
@@ -15,6 +9,12 @@ import org.topbraid.mauiserver.framework.Resource.Deletable;
 import org.topbraid.mauiserver.framework.Resource.Gettable;
 import org.topbraid.mauiserver.framework.Resource.Postable;
 import org.topbraid.mauiserver.framework.Resource.Puttable;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
 public class RootServlet extends HttpServlet {

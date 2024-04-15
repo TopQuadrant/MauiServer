@@ -6,7 +6,7 @@ Maui Server provides a topic indexing service. It automatically determines the m
 
 ## Download and Installation
 
-**Requirements:** Maui Server requires a Java Servlet Container such as Apache Tomcat or Jetty to run.
+**Requirements:** Maui Server requires a Java Servlet Container such as Apache Tomcat or Jetty to run. The container must support at least Servlet Spec 6.0 or Jakarta EE 10.
 
 **Download:** Maui Server is distributed as a war file (`mauiserver-X.Y.Z.war`). It can be downloaded [here](https://github.com/TopQuadrant/MauiServer/releases). The very latest pre-release version can also be built from the source repository, see below.
 
@@ -56,6 +56,11 @@ The API root is at `/`. A small demo app is at `/app/` (requires tagger creation
 This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/licenses/gpl.html).
 
 ## Version history
+
+### 1.5.0 (2024-04-10)
+- Upgrade to Jakarta Servlets 6.0
+- Require a servlet container compatible with Servlets 6.0, e.g., Tomcat 10
+- Require Java 17
 
 ### 1.4.0 (2023-12-18)
 - Update various libraries

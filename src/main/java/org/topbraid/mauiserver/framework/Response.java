@@ -2,17 +2,17 @@ package org.topbraid.mauiserver.framework;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.shared.JenaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.shared.JenaException;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public abstract class Response {
 	private final static Logger log = LoggerFactory.getLogger(Response.class);

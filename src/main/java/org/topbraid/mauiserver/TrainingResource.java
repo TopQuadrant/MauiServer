@@ -2,8 +2,6 @@ package org.topbraid.mauiserver;
 
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
@@ -12,6 +10,8 @@ import org.topbraid.mauiserver.tagger.JobReport;
 import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TrainingDocument;
 import org.topbraid.mauiserver.tagger.TrainingJob;
+
+import jakarta.servlet.ServletContext;
 
 public class TrainingResource extends AbstractTrainingJobResource {
 	private final Tagger tagger;

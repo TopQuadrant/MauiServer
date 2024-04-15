@@ -1,7 +1,6 @@
 package org.topbraid.mauiserver;
 
-import javax.servlet.ServletContext;
-
+import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.framework.Request;
@@ -14,7 +13,8 @@ import org.topbraid.mauiserver.tagger.Tagger;
 
 import com.entopix.maui.vocab.Vocabulary;
 import com.entopix.maui.vocab.VocabularyStore;
-import org.apache.jena.rdf.model.Model;
+
+import jakarta.servlet.ServletContext;
 
 public class VocabularyResource extends Resource
 		implements Gettable, Puttable, Deletable {

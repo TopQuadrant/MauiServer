@@ -1,7 +1,5 @@
 package org.topbraid.mauiserver;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Resource.Gettable;
@@ -15,6 +13,8 @@ import org.topbraid.mauiserver.tagger.TaggerConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.servlet.ServletContext;
 
 public class HomeResource extends Resource implements Gettable, Postable {
 	private TaggerCollection taggers;
