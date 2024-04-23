@@ -1,7 +1,5 @@
 package org.topbraid.mauiserver;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Resource.Deletable;
@@ -12,6 +10,8 @@ import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.tagger.AsyncJob;
 import org.topbraid.mauiserver.tagger.JobController;
 import org.topbraid.mauiserver.tagger.JobReport;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * A resource in charge of a {@link JobController}.

@@ -2,8 +2,6 @@ package org.topbraid.mauiserver;
 
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.framework.JsonLinesParser;
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Response;
@@ -14,6 +12,8 @@ import org.topbraid.mauiserver.tagger.JobReport;
 import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TrainingDataParser;
 import org.topbraid.mauiserver.tagger.TrainingDocument;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * A resource in charge of a {@link JobController} that processes

@@ -1,7 +1,5 @@
 package org.topbraid.mauiserver;
 
-import javax.servlet.ServletContext;
-
 import org.topbraid.mauiserver.framework.Request;
 import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Resource.Gettable;
@@ -10,6 +8,8 @@ import org.topbraid.mauiserver.framework.Response;
 import org.topbraid.mauiserver.framework.Response.JSONResponse;
 import org.topbraid.mauiserver.tagger.RecommendationResult;
 import org.topbraid.mauiserver.tagger.Tagger;
+
+import jakarta.servlet.ServletContext;
 
 public class SuggestResource extends Resource implements Gettable, Postable {
 	private final Tagger tagger;

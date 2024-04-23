@@ -4,8 +4,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.topbraid.mauiserver.classifier.ClassifierResource;
@@ -13,6 +11,8 @@ import org.topbraid.mauiserver.framework.Resource;
 import org.topbraid.mauiserver.framework.Server;
 import org.topbraid.mauiserver.tagger.Tagger;
 import org.topbraid.mauiserver.tagger.TaggerCollection;
+
+import jakarta.servlet.ServletContext;
 
 public class MauiServer implements Server {
 	public final static Logger log = LoggerFactory.getLogger(MauiServer.class);

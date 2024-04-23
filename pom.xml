@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.topbraid</groupId>
     <artifactId>mauiserver</artifactId>
-    <version>1.4.0-tq</version>
+    <version>1.5.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Maui Server</name>
     <description>An HTTP wrapper around the Maui Topic Indexer</description>
@@ -28,7 +28,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <dependencies>
@@ -38,9 +38,9 @@
             <version>1.4.0-tq</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -80,14 +80,30 @@
         </resources>
         <plugins>
             <plugin>
+<!--
+  We should use Jetty 12: org.eclipse.jetty.ee10:jetty-ee10-maven-plugin:12.0.8
+  because that provides jakarta.servlet-api:6.0.0 while Jetty 11
+  only provides 5.0.0. But one of Weka's transitive dependencies
+  is of type :pom: and Jetty 12 doesn't seem to support this
+  type. So we use Jetty 11 which seems to work fine. We could also
+  use jetty:run-war instead of jetty:run.
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-maven-plugin</artifactId>
+                <version>12.0.8</version>
+-->
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.53.v20231009</version>
+                <version>11.0.20</version>
                 <configuration>
                     <loginServices>
                         <loginService implementation="org.eclipse.jetty.security.HashLoginService">
                             <name>Maui Server</name>
                             <config>${project.basedir}/src/etc/realm.properties</config>
+<!-- The above works for Jetty up to 11; the below for Jetty 12
+                            <config implementation="org.eclipse.jetty.ee10.maven.plugin.MavenResource">
+                                <resourceAsString>${project.basedir}/src/etc/realm.properties</resourceAsString>
+                            </config>
+-->
                         </loginService>
                     </loginServices>
                 </configuration>

@@ -1,6 +1,6 @@
 package org.topbraid.mauiserver.framework;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public abstract class Resource {
 	private final ServletContext context;
