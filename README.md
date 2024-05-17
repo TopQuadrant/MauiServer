@@ -57,7 +57,7 @@ This project is licensed under the terms of the [GNU GPL v3](http://www.gnu.org/
 
 ## Version history
 
-### 1.5.0 (2024-04-10)
+### 1.5.0 (2024-05-17)
 - Upgrade to Jakarta Servlets 6.0
 - Require a servlet container compatible with Servlets 6.0, e.g., Tomcat 10
 - Require Java 17

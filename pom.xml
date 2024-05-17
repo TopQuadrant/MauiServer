@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.topbraid</groupId>
     <artifactId>mauiserver</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.0-tq</version>
     <packaging>war</packaging>
     <name>Maui Server</name>
     <description>An HTTP wrapper around the Maui Topic Indexer</description>
